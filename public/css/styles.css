@@ -13,19 +13,24 @@ body {
     justify-content: center;
     align-items: center;
     user-select: none;
+    min-width: 320px; /* Ensure minimum readable width */
+    overflow-x: auto;
 }
 
 .game-container {
     width: 100%;
     max-width: 1400px;
+    min-width: 800px; /* Minimum game area width */
     display: flex;
     height: 100vh;
+    min-height: 600px; /* Minimum game area height */
     background: #1a3f2e;
     color: white;
     overflow: hidden;
     justify-content: center;
     align-items: center;
     padding: 20px;
+    transform-origin: center center;
 }
 
 .main-game {
@@ -2296,5 +2301,33 @@ body {
     
     .btn:active {
         transform: scale(0.95);
+    }
+}
+
+/* Auto-scaling for very small screens */
+@media (max-width: 320px), (max-height: 568px) {
+    .game-container {
+        transform: scale(0.85);
+        transform-origin: center center;
+        min-width: 280px;
+        min-height: 400px;
+    }
+    
+    body {
+        min-width: 280px;
+    }
+}
+
+/* Force horizontal scrolling on extremely narrow screens */
+@media (max-width: 280px) {
+    body {
+        overflow-x: scroll;
+        min-width: 320px;
+    }
+    
+    .game-container {
+        min-width: 800px;
+        transform: scale(0.35);
+        margin: 0 auto;
     }
 }

@@ -24,27 +24,6 @@ const store = new Store({
 });
 
 let mainWindow;
-let serverProcess;
-
-/**
- * Start local Express server for production builds
- * @function startLocalServer
- */
-function startLocalServer() {
-  if (!isDev) {
-    const { spawn } = require('child_process');
-    const serverPath = path.join(__dirname, '..', 'server.js');
-    
-    serverProcess = spawn('node', [serverPath], {
-      stdio: 'inherit',
-      shell: isWin
-    });
-    
-    serverProcess.on('error', (err) => {
-      console.error('Failed to start server:', err);
-    });
-  }
-}
 
 /**
  * Create the main application window with Vercel Analytics integration
@@ -92,9 +71,6 @@ function createWindow() {
 
   mainWindow.on('closed', () => {
     mainWindow = null;
-    if (serverProcess) {
-      serverProcess.kill();
-    }
   });
 }
 
@@ -253,7 +229,5 @@ app.on('activate', () => {
 });
 
 app.on('before-quit', () => {
-  if (serverProcess) {
-    serverProcess.kill();
-  }
+  // Cleanup handled in window closed event
 });

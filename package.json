@@ -67,8 +67,7 @@
     "files": [
       "electron/**/*",
       "public/**/*",
-      "assets/**/*",
-      "server.js"
+      "assets/**/*"
     ],
     "extraResources": [
       {

@@ -23,6 +23,8 @@ class EuchreGame {
         this.team1Score = 0;
         this.team2Score = 0;
         this.trump = null;
+        this.trumpCaller = null;
+        this.trumpCallerTeam = null;
         this.currentDealer = this.getRandomDealer();
         this.currentPlayer = null;
         this.currentTrick = [];
@@ -494,14 +496,19 @@ class EuchreGame {
      */
     selectTrump(suit) {
         this.trump = suit;
+        this.trumpCaller = this.trumpSelectionPlayer || 'south';
+        this.trumpCallerTeam = this.getTeam(this.trumpCaller);
         
+        // Play trump selection sound
+        this.playSound('trumpSelect');
         
         // If it's the player's turn, show alone option
         if (this.trumpSelectionPlayer === 'south') {
             this.canGoAlone = true;
             document.getElementById('alone-option').style.display = 'block';
+            const teamName = this.trumpCallerTeam === 1 ? 'You & North' : 'East & West';
             document.getElementById('trump-display').innerHTML = 
-                `Trump: <span style="color: ${suit === '♥' || suit === '♦' ? '#e74c3c' : '#2c3e50'}">${suit}</span>`;
+                `Trump: <span style="color: ${suit === '♥' || suit === '♦' ? '#e74c3c' : '#2c3e50'}">${suit}</span> <span style="color: #7f8c8d; font-size: 0.9em;">(called by ${teamName})</span>`;
             this.showMessage('Trump selected! Go alone or continue?');
             return;
         }
@@ -511,8 +518,9 @@ class EuchreGame {
         this.hideTrumpSelection();
         this.hideKitty();
         
+        const teamName = this.trumpCallerTeam === 1 ? 'You & North' : 'East & West';
         document.getElementById('trump-display').innerHTML = 
-            `Trump: <span style="color: ${suit === '♥' || suit === '♦' ? '#e74c3c' : '#2c3e50'}">${suit}</span>`;
+            `Trump: <span style="color: ${suit === '♥' || suit === '♦' ? '#e74c3c' : '#2c3e50'}">${suit}</span> <span style="color: #7f8c8d; font-size: 0.9em;">(called by ${teamName})</span>`;
         
         // Handle dealer pickup if trump was selected in first round
         if (this.trumpSelectionRound === 1) {
@@ -533,8 +541,9 @@ class EuchreGame {
         // Mark partner as sitting out
         document.getElementById('north-avatar').classList.add('sitting-out');
         
+        const teamName = this.trumpCallerTeam === 1 ? 'You & North' : 'East & West';
         document.getElementById('trump-display').innerHTML = 
-            `Trump: <span style="color: ${this.trump === '♥' || this.trump === '♦' ? '#e74c3c' : '#2c3e50'}">${this.trump}</span> <span style="color: gold; font-weight: bold;">(ALONE)</span>`;
+            `Trump: <span style="color: ${this.trump === '♥' || this.trump === '♦' ? '#e74c3c' : '#2c3e50'}">${this.trump}</span> <span style="color: #7f8c8d; font-size: 0.9em;">(called by ${teamName})</span> <span style="color: gold; font-weight: bold;">(ALONE)</span>`;
         
         this.showMessage(`${this.playerSettings.south.name} is playing alone! ${this.playerSettings.north.name} sits out.`);
         
@@ -1082,6 +1091,8 @@ class EuchreGame {
         this.round = 1;
         this.currentTrick = [];
         this.trump = null;
+        this.trumpCaller = null;
+        this.trumpCallerTeam = null;
         this.trumpSelectionPhase = false;
         this.trumpSelectionPlayer = null;
         this.trumpSelectionRound = 1;
@@ -1364,6 +1375,12 @@ class EuchreGame {
     showDealerDiscardDialog() {
         const dialog = document.getElementById('dealer-discard');
         const handContainer = document.getElementById('dealer-hand');
+        
+        // Update dialog title to show trump caller
+        const teamName = this.trumpCallerTeam === 1 ? 'You & North' : 'East & West';
+        const trumpColor = this.trump === '♥' || this.trump === '♦' ? '#e74c3c' : '#2c3e50';
+        dialog.querySelector('h3').innerHTML = 
+            `Dealer: Pick up and discard<br><span style="font-size: 0.8em; color: #7f8c8d;">Trump: <span style="color: ${trumpColor}">${this.trump}</span> (called by ${teamName})</span>`;
         
         // Show all dealer's cards for discard selection
         handContainer.innerHTML = '';
@@ -1685,6 +1702,15 @@ class EuchreGame {
     }
     
     /**
+     * Get the team number (1 or 2) for a given player
+     * @param {string} player - Player position (south, north, east, west)
+     * @returns {number} Team number (1 for south/north, 2 for east/west)
+     */
+    getTeam(player) {
+        return (player === 'south' || player === 'north') ? 1 : 2;
+    }
+    
+    /**
      * Initialize audio context after user gesture to comply with browser autoplay policies
      * @method initAudioContext
      */
@@ -1722,17 +1748,52 @@ class EuchreGame {
             // Different sounds for different actions
             switch (soundType) {
                 case 'cardPlay':
-                    // Create a more realistic "card snap" sound
-                    oscillator.frequency.setValueAtTime(800, this.audioContext.currentTime);
-                    oscillator.frequency.exponentialRampToValueAtTime(200, this.audioContext.currentTime + 0.05);
-                    oscillator.frequency.exponentialRampToValueAtTime(150, this.audioContext.currentTime + 0.08);
-                    gainNode.gain.setValueAtTime(0.08, this.audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.02, this.audioContext.currentTime + 0.05);
-                    gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.08);
-                    oscillator.type = 'square';
+                    // Crisp card snap with layered frequencies
+                    oscillator.frequency.setValueAtTime(1200, this.audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(300, this.audioContext.currentTime + 0.03);
+                    gainNode.gain.setValueAtTime(0.06, this.audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.05);
+                    oscillator.type = 'triangle';
                     oscillator.start();
-                    oscillator.stop(this.audioContext.currentTime + 0.08);
+                    oscillator.stop(this.audioContext.currentTime + 0.05);
                     break;
+                    
+                case 'trumpSelect':
+                    // Ascending chime for trump selection
+                    oscillator.frequency.setValueAtTime(523, this.audioContext.currentTime);
+                    oscillator.frequency.setValueAtTime(659, this.audioContext.currentTime + 0.08);
+                    oscillator.frequency.setValueAtTime(784, this.audioContext.currentTime + 0.16);
+                    gainNode.gain.setValueAtTime(0.08, this.audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.4);
+                    oscillator.type = 'sine';
+                    oscillator.start();
+                    oscillator.stop(this.audioContext.currentTime + 0.4);
+                    break;
+                    
+                case 'trickWin':
+                    // Victory ding
+                    oscillator.frequency.setValueAtTime(880, this.audioContext.currentTime);
+                    oscillator.frequency.setValueAtTime(1760, this.audioContext.currentTime + 0.1);
+                    gainNode.gain.setValueAtTime(0.1, this.audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.3);
+                    oscillator.type = 'sine';
+                    oscillator.start();
+                    oscillator.stop(this.audioContext.currentTime + 0.3);
+                    break;
+                    
+                case 'gameWin':
+                    // Fanfare for game win
+                    oscillator.frequency.setValueAtTime(523, this.audioContext.currentTime);
+                    oscillator.frequency.setValueAtTime(659, this.audioContext.currentTime + 0.15);
+                    oscillator.frequency.setValueAtTime(784, this.audioContext.currentTime + 0.3);
+                    oscillator.frequency.setValueAtTime(1047, this.audioContext.currentTime + 0.45);
+                    gainNode.gain.setValueAtTime(0.12, this.audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.8);
+                    oscillator.type = 'sawtooth';
+                    oscillator.start();
+                    oscillator.stop(this.audioContext.currentTime + 0.8);
+                    break;
+                    
                 default:
                     return;
             }

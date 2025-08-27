@@ -55,7 +55,6 @@ class EuchreGame {
         this.trumpTurnOrder = [];
         this.dealerDiscardPhase = false;
         this.gamePhase = 'setup';
-        this.soundEnabled = true;
         
         this.init();
         this.setupSettingsEventListeners();
@@ -163,6 +162,17 @@ class EuchreGame {
         // Hide deal button when dealing starts
         this.hideDealButton();
         
+        this.showMessage('Dealing cards...');
+        
+        // Start dealing animation
+        this.animateCardDealing();
+    }
+    
+    /**
+     * Create actual deck and perform the dealing logic
+     * Called after animation completes
+     */
+    performActualDeal() {
         this.createDeck();
         
         // Clear previous cards and reset tricks
@@ -273,12 +283,14 @@ class EuchreGame {
                             console.log(`✨ Playable card: ${card.rank}${card.suit}`);
                         }
                         
-                        if (isPlayable) {
+                        if (isPlayable && !this.trumpSelectionPhase && this.gamePhase === 'play') {
                             cardDiv.onclick = () => this.playCard(position, index);
                         }
                     } else {
                         // Always clickable when not player's turn (for normal game flow)
-                        cardDiv.onclick = () => this.playCard(position, index);
+                        if (!this.trumpSelectionPhase && this.gamePhase === 'play') {
+                            cardDiv.onclick = () => this.playCard(position, index);
+                        }
                     }
                 } else {
                     cardDiv.className = 'card back classic';
@@ -502,8 +514,6 @@ class EuchreGame {
         this.trumpCaller = this.trumpSelectionPlayer || 'south';
         this.trumpCallerTeam = this.getTeam(this.trumpCaller);
         
-        // Play trump selection sound
-        this.playSound('trumpSelect');
         
         // If it's the player's turn, show alone option
         if (this.trumpSelectionPlayer === 'south') {
@@ -613,6 +623,16 @@ class EuchreGame {
     }
     
     playCard(player, cardIndex) {
+        if (this.trumpSelectionPhase) {
+            this.showMessage("Please select trump first!");
+            return;
+        }
+        
+        if (this.gamePhase !== 'play') {
+            this.showMessage("Cards cannot be played right now.");
+            return;
+        }
+        
         if (player !== this.currentPlayer) {
             this.showMessage("It's not your turn!");
             return;
@@ -659,8 +679,6 @@ class EuchreGame {
         
         this.currentTrick.push({ player, card });
         
-        // Play card sound effect
-        this.playSound('cardPlay');
         
         this.displayTrick();
         this.displayCards();
@@ -1520,7 +1538,6 @@ class EuchreGame {
         try {
             const settings = {
                 players: this.playerSettings,
-                soundEnabled: this.soundEnabled
             };
             localStorage.setItem('euchre-player-settings', JSON.stringify(settings));
         } catch (e) {
@@ -1538,17 +1555,11 @@ class EuchreGame {
                 if (savedSettings.players) {
                     // New format with sound settings
                     this.playerSettings = { ...this.playerSettings, ...savedSettings.players };
-                    this.soundEnabled = savedSettings.soundEnabled ?? true;
                 } else {
                     // Old format - just player settings
                     this.playerSettings = { ...this.playerSettings, ...savedSettings };
                 }
                 
-                // Update sound button UI
-                const soundBtn = document.getElementById('sound-toggle');
-                if (soundBtn) {
-                    soundBtn.textContent = this.soundEnabled ? '🔊' : '🔇';
-                }
                 
                 // Check if saved settings have default names and need randomization
                 const playerData = savedSettings.players || savedSettings;
@@ -1725,111 +1736,6 @@ class EuchreGame {
     }
     
     /**
-     * Initialize audio context after user gesture to comply with browser autoplay policies
-     * @method initAudioContext
-     */
-    initAudioContext() {
-        if (!this.audioContext && this.soundEnabled) {
-            try {
-                this.audioContext = new (window.AudioContext || window['webkitAudioContext'])();
-                if (this.audioContext.state === 'suspended') {
-                    this.audioContext.resume();
-                }
-            } catch (error) {
-                console.log('🔇 Audio not supported');
-            }
-        }
-    }
-
-    /**
-     * Play sound effect if sounds are enabled
-     * @param {string} soundType - Type of sound to play
-     */
-    playSound(soundType) {
-        if (!this.soundEnabled) return;
-        
-        // Initialize audio context if needed
-        this.initAudioContext();
-        if (!this.audioContext) return;
-        
-        try {
-            const oscillator = this.audioContext.createOscillator();
-            const gainNode = this.audioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(this.audioContext.destination);
-            
-            // Different sounds for different actions
-            switch (soundType) {
-                case 'cardPlay':
-                    // Crisp card snap with layered frequencies
-                    oscillator.frequency.setValueAtTime(1200, this.audioContext.currentTime);
-                    oscillator.frequency.exponentialRampToValueAtTime(300, this.audioContext.currentTime + 0.03);
-                    gainNode.gain.setValueAtTime(0.06, this.audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.05);
-                    oscillator.type = 'triangle';
-                    oscillator.start();
-                    oscillator.stop(this.audioContext.currentTime + 0.05);
-                    break;
-                    
-                case 'trumpSelect':
-                    // Ascending chime for trump selection
-                    oscillator.frequency.setValueAtTime(523, this.audioContext.currentTime);
-                    oscillator.frequency.setValueAtTime(659, this.audioContext.currentTime + 0.08);
-                    oscillator.frequency.setValueAtTime(784, this.audioContext.currentTime + 0.16);
-                    gainNode.gain.setValueAtTime(0.08, this.audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.4);
-                    oscillator.type = 'sine';
-                    oscillator.start();
-                    oscillator.stop(this.audioContext.currentTime + 0.4);
-                    break;
-                    
-                case 'trickWin':
-                    // Victory ding
-                    oscillator.frequency.setValueAtTime(880, this.audioContext.currentTime);
-                    oscillator.frequency.setValueAtTime(1760, this.audioContext.currentTime + 0.1);
-                    gainNode.gain.setValueAtTime(0.1, this.audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.3);
-                    oscillator.type = 'sine';
-                    oscillator.start();
-                    oscillator.stop(this.audioContext.currentTime + 0.3);
-                    break;
-                    
-                case 'gameWin':
-                    // Fanfare for game win
-                    oscillator.frequency.setValueAtTime(523, this.audioContext.currentTime);
-                    oscillator.frequency.setValueAtTime(659, this.audioContext.currentTime + 0.15);
-                    oscillator.frequency.setValueAtTime(784, this.audioContext.currentTime + 0.3);
-                    oscillator.frequency.setValueAtTime(1047, this.audioContext.currentTime + 0.45);
-                    gainNode.gain.setValueAtTime(0.12, this.audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.8);
-                    oscillator.type = 'sawtooth';
-                    oscillator.start();
-                    oscillator.stop(this.audioContext.currentTime + 0.8);
-                    break;
-                    
-                default:
-                    return;
-            }
-        } catch (error) {
-            console.log('🔇 Audio playback error:', error);
-        }
-    }
-    
-    /**
-     * Toggle sound effects on/off and update UI
-     * @method toggleSound
-     */
-    toggleSound() {
-        this.soundEnabled = !this.soundEnabled;
-        const soundBtn = document.getElementById('sound-toggle');
-        if (soundBtn) {
-            soundBtn.textContent = this.soundEnabled ? '🔊' : '🔇';
-        }
-        this.saveSettings();
-    }
-    
-    /**
      * Show the deal button in center area
      * @method showDealButton
      */
@@ -1860,6 +1766,119 @@ class EuchreGame {
             dealContainer.classList.add('hidden');
             dealContainer.style.display = 'none';
         }
+    }
+    
+    /**
+     * Animate cards being dealt from center to players
+     * @method animateCardDealing
+     */
+    animateCardDealing() {
+        const centerArea = document.getElementById('center-area');
+        const playerPositions = ['south', 'west', 'north', 'east']; // Dealing order
+        
+        // Create deck animation in center
+        const deckElement = document.createElement('div');
+        deckElement.className = 'dealing-deck';
+        deckElement.innerHTML = '🂠'; // Card back unicode
+        centerArea.appendChild(deckElement);
+        
+        let cardCount = 0;
+        let dealingInterval;
+        
+        // Deal 5 cards to each player (20 total)
+        const dealCard = () => {
+            if (cardCount >= 20) {
+                clearInterval(dealingInterval);
+                // Clean up deck element
+                deckElement.remove();
+                
+                // Deal flipped card after short delay
+                setTimeout(() => {
+                    this.animateFlippedCard();
+                }, 300);
+                return;
+            }
+            
+            const playerIndex = cardCount % 4;
+            const playerPos = playerPositions[playerIndex];
+            
+            // Create animated card
+            const animCard = document.createElement('div');
+            animCard.className = 'dealing-card';
+            animCard.innerHTML = '🂠';
+            
+            // Position at center initially
+            const centerRect = centerArea.getBoundingClientRect();
+            animCard.style.position = 'absolute';
+            animCard.style.left = '50%';
+            animCard.style.top = '50%';
+            animCard.style.transform = 'translate(-50%, -50%)';
+            animCard.style.zIndex = '1000';
+            animCard.style.fontSize = '24px';
+            animCard.style.transition = 'all 0.4s ease-out';
+            
+            centerArea.appendChild(animCard);
+            
+            // Animate to player position
+            setTimeout(() => {
+                const targetElement = document.getElementById(`${playerPos}-cards`);
+                if (targetElement) {
+                    const targetRect = targetElement.getBoundingClientRect();
+                    const centerRect = centerArea.getBoundingClientRect();
+                    
+                    const deltaX = targetRect.left - centerRect.left;
+                    const deltaY = targetRect.top - centerRect.top;
+                    
+                    animCard.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0.8)`;
+                    animCard.style.opacity = '0.8';
+                }
+                
+                // Remove animated card after animation
+                setTimeout(() => {
+                    animCard.remove();
+                }, 400);
+            }, 50);
+            
+            // Play dealing sound
+            
+            cardCount++;
+        };
+        
+        // Deal cards with timing
+        dealingInterval = setInterval(dealCard, 150);
+    }
+    
+    /**
+     * Animate the flipped card reveal
+     * @method animateFlippedCard
+     */
+    animateFlippedCard() {
+        const centerArea = document.getElementById('center-area');
+        
+        // Create flipped card animation
+        const flippedCard = document.createElement('div');
+        flippedCard.className = 'flipped-card-animation';
+        flippedCard.innerHTML = '🂠';
+        flippedCard.style.position = 'absolute';
+        flippedCard.style.left = '50%';
+        flippedCard.style.top = '50%';
+        flippedCard.style.transform = 'translate(-50%, -50%) rotateY(0deg)';
+        flippedCard.style.fontSize = '36px';
+        flippedCard.style.zIndex = '999';
+        flippedCard.style.transition = 'transform 0.6s ease';
+        
+        centerArea.appendChild(flippedCard);
+        
+        // Flip animation
+        setTimeout(() => {
+            flippedCard.style.transform = 'translate(-50%, -50%) rotateY(180deg)';
+        }, 100);
+        
+        // Remove animation and start actual game logic
+        setTimeout(() => {
+            flippedCard.remove();
+            this.performActualDeal();
+        }, 700);
     }
 
 

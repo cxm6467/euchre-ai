@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Euchre Game</title>
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/mobile.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
@@ -20,9 +21,6 @@
                     <div class="control-buttons">
                         <button class="new-game-btn" onclick="game.showNewGameConfirm()">
                             New Game
-                        </button>
-                        <button class="icon-btn" title="Toggle Sound" id="sound-toggle" onclick="game.toggleSound()">
-                            🔊
                         </button>
                         <button class="icon-btn" title="How to Play" onclick="game.showHelp()">
                             <i class="fas fa-question-circle"></i>
@@ -146,7 +144,8 @@
                 <div class="message" id="message"></div>
                 
                 <div class="trump-selection" id="trump-selection">
-                    <h3>Choose Trump Suit</h3>
+                    <div class="trump-content">
+                        <h3>Choose Trump Suit</h3>
                     <div class="trump-options">
                         <div class="trump-option" onclick="game.selectTrump('♠')" style="color: #2c3e50">♠</div>
                         <div class="trump-option" onclick="game.selectTrump('♥')" style="color: #e74c3c">♥</div>
@@ -162,6 +161,7 @@
                             <button class="pass-btn" onclick="game.continueWithPartner()">With Partner</button>
                         </div>
                         <div style="font-size: 12px; margin-top: 5px; color: #666; text-align: center;">Play without your partner for extra points</div>
+                    </div>
                     </div>
                 </div>
                 
@@ -182,8 +182,10 @@
                 </div>
                 
                 <div class="dealer-discard" id="dealer-discard">
-                    <h3>Dealer: Pick up and discard</h3>
-                    <div class="dealer-hand" id="dealer-hand"></div>
+                    <div class="discard-content">
+                        <h3>Dealer: Pick up and discard</h3>
+                        <div class="dealer-hand" id="dealer-hand"></div>
+                    </div>
                 </div>
                 
                 <div class="new-game-modal" id="new-game-modal">

@@ -967,6 +967,64 @@ body {
     display: none;
 }
 
+/* Card dealing animations */
+.dealing-deck {
+    font-size: 40px;
+    animation: deckPulse 1s ease-in-out infinite alternate;
+    z-index: 998;
+}
+
+@keyframes deckPulse {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(1.05); opacity: 0.9; }
+}
+
+.dealing-card {
+    font-size: 24px;
+    pointer-events: none;
+    color: #2c3e50;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    animation: cardGlow 0.4s ease-out;
+}
+
+@keyframes cardGlow {
+    0% { 
+        transform: translate(-50%, -50%) scale(1);
+        box-shadow: 0 0 0 rgba(52, 152, 219, 0.6);
+    }
+    50% { 
+        transform: translate(-50%, -50%) scale(1.1);
+        box-shadow: 0 0 15px rgba(52, 152, 219, 0.8);
+    }
+    100% { 
+        transform: translate(-50%, -50%) scale(1);
+        box-shadow: 0 0 0 rgba(52, 152, 219, 0.6);
+    }
+}
+
+.flipped-card-animation {
+    font-size: 36px;
+    color: #e74c3c;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+    animation: cardReveal 0.6s ease;
+    pointer-events: none;
+}
+
+@keyframes cardReveal {
+    0% { 
+        transform: translate(-50%, -50%) rotateY(0deg) scale(1);
+        opacity: 1;
+    }
+    50% { 
+        transform: translate(-50%, -50%) rotateY(90deg) scale(1.1);
+        opacity: 0.8;
+    }
+    100% { 
+        transform: translate(-50%, -50%) rotateY(180deg) scale(1);
+        opacity: 1;
+    }
+}
+
 .trick-card {
     width: 80px;
     height: 110px;
@@ -1337,22 +1395,32 @@ body {
 
 /* Trump Selection Dialog */
 .trump-selection {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 30px;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    z-index: 200;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
     display: none;
-    text-align: center;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
 }
 
 .trump-selection.active {
-    display: block;
-    animation: slideIn 0.3s;
+    display: flex;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.trump-selection .trump-content {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
 }
 
 .trump-selection h3 {
@@ -1632,22 +1700,32 @@ body {
 
 /* Dealer discard selection */
 .dealer-discard {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 30px;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    z-index: 200;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
     display: none;
-    text-align: center;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
 }
 
 .dealer-discard.active {
-    display: block;
-    animation: slideIn 0.3s;
+    display: flex;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.dealer-discard .discard-content {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
 }
 
 .dealer-discard h3 {
@@ -2382,12 +2460,12 @@ body {
 /* CSS Custom Properties for fluid scaling */
 :root {
     --game-scale: clamp(0.6, min(100vw / 900, 100vh / 650), 1.1);
-    --card-width: clamp(30px, 7vw, 60px);
-    --card-height: clamp(42px, 10vw, 85px);
+    --card-width: clamp(40px, 8vw, 70px);
+    --card-height: clamp(56px, 11.2vw, 98px);
     --avatar-size: clamp(35px, 9vw, 80px);
-    --font-size-small: clamp(9px, 2vw, 13px);
-    --font-size-normal: clamp(11px, 2.5vw, 15px);
-    --font-size-large: clamp(13px, 3vw, 18px);
+    --font-size-small: clamp(11px, 2.5vw, 15px);
+    --font-size-normal: clamp(13px, 3vw, 17px);
+    --font-size-large: clamp(15px, 3.5vw, 20px);
     --spacing-small: clamp(3px, 1vw, 8px);
     --spacing-medium: clamp(6px, 1.5vw, 15px);
     --spacing-large: clamp(10px, 2.5vw, 20px);
@@ -2408,6 +2486,8 @@ body {
     width: var(--card-width) !important;
     height: var(--card-height) !important;
     font-size: var(--font-size-small) !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3) !important;
+    border: 1px solid rgba(0,0,0,0.1);
 }
 
 /* Responsive avatars */
@@ -2458,9 +2538,41 @@ body {
 @media (max-width: 480px) {
     :root {
         --game-scale: clamp(0.4, min(100vw / 800, 100vh / 700), 0.7);
-        --card-width: clamp(25px, 6vw, 40px);
-        --card-height: clamp(35px, 8.5vw, 56px);
+        --card-width: clamp(35px, 7.5vw, 50px);
+        --card-height: clamp(49px, 10.5vw, 70px);
         --avatar-size: clamp(30px, 8vw, 60px);
+    }
+}
+
+/* Mobile card styling improvements */
+@media (max-width: 768px) {
+    .card .card-corner .rank {
+        font-weight: 900 !important;
+        font-size: calc(var(--font-size-small) * 1.1) !important;
+        text-shadow: 0 0 1px rgba(0,0,0,0.3);
+    }
+    
+    .card .card-corner .suit {
+        font-size: calc(var(--font-size-small) * 0.9) !important;
+        text-shadow: 0 0 1px rgba(0,0,0,0.2);
+    }
+    
+    .card .card-center {
+        font-size: calc(var(--font-size-small) * 2.2) !important;
+        font-weight: 900 !important;
+        text-shadow: 0 0 2px rgba(0,0,0,0.3);
+    }
+    
+    .player-position.bottom .card .card-corner .rank {
+        font-size: calc(var(--font-size-normal) * 1.2) !important;
+    }
+    
+    .player-position.bottom .card .card-corner .suit {
+        font-size: calc(var(--font-size-normal) * 1.0) !important;
+    }
+    
+    .player-position.bottom .card .card-center {
+        font-size: calc(var(--font-size-normal) * 2.8) !important;
     }
 }
 
@@ -2539,11 +2651,11 @@ body {
 @media (max-width: 360px) {
     :root {
         --game-scale: clamp(0.35, min(100vw / 700, 100vh / 600), 0.6);
-        --card-width: clamp(22px, 5.5vw, 35px);
-        --card-height: clamp(31px, 7.7vw, 49px);
+        --card-width: clamp(32px, 6.5vw, 42px);
+        --card-height: clamp(45px, 9vw, 59px);
         --avatar-size: clamp(28px, 7vw, 50px);
-        --font-size-small: clamp(8px, 1.8vw, 11px);
-        --font-size-normal: clamp(10px, 2.2vw, 13px);
+        --font-size-small: clamp(10px, 2.2vw, 13px);
+        --font-size-normal: clamp(12px, 2.6vw, 15px);
     }
     
     .game-container {

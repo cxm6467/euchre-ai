@@ -1122,18 +1122,28 @@ class EuchreGame {
         if (team2ScoreEl) team2ScoreEl.textContent = this.team2Score;
         if (roundEl) roundEl.textContent = this.round;
         
-        // Update tricks display
+        // Update tricks display and progress bars
         if (team1TricksEl) {
             const team1Tricks = (this.players.south?.tricks || 0) + (this.players.north?.tricks || 0);
             const oldValue = parseInt(team1TricksEl.textContent);
             team1TricksEl.textContent = team1Tricks;
             
+            // Update progress bar
+            const team1Progress = document.getElementById('team1-progress');
+            if (team1Progress) {
+                const percentage = (team1Tricks / 5) * 100;
+                team1Progress.style.width = `${percentage}%`;
+            }
+            
             // Add animation if tricks increased
             if (team1Tricks > oldValue) {
-                team1TricksEl.parentElement.classList.add('tricks-update');
-                setTimeout(() => {
-                    team1TricksEl.parentElement.classList.remove('tricks-update');
-                }, 400);
+                const progressBar = document.querySelector('#team1-progress').closest('.progress-bar');
+                if (progressBar) {
+                    progressBar.classList.add('tricks-update');
+                    setTimeout(() => {
+                        progressBar.classList.remove('tricks-update');
+                    }, 400);
+                }
             }
         }
         if (team2TricksEl) {
@@ -1141,12 +1151,22 @@ class EuchreGame {
             const oldValue = parseInt(team2TricksEl.textContent);
             team2TricksEl.textContent = team2Tricks;
             
+            // Update progress bar
+            const team2Progress = document.getElementById('team2-progress');
+            if (team2Progress) {
+                const percentage = (team2Tricks / 5) * 100;
+                team2Progress.style.width = `${percentage}%`;
+            }
+            
             // Add animation if tricks increased
             if (team2Tricks > oldValue) {
-                team2TricksEl.parentElement.classList.add('tricks-update');
-                setTimeout(() => {
-                    team2TricksEl.parentElement.classList.remove('tricks-update');
-                }, 400);
+                const progressBar = document.querySelector('#team2-progress').closest('.progress-bar');
+                if (progressBar) {
+                    progressBar.classList.add('tricks-update');
+                    setTimeout(() => {
+                        progressBar.classList.remove('tricks-update');
+                    }, 400);
+                }
             }
         }
     }
@@ -1705,12 +1725,16 @@ class EuchreGame {
             // Different sounds for different actions
             switch (soundType) {
                 case 'cardPlay':
-                    oscillator.frequency.setValueAtTime(440, this.audioContext.currentTime);
-                    oscillator.frequency.exponentialRampToValueAtTime(220, this.audioContext.currentTime + 0.1);
-                    gainNode.gain.setValueAtTime(0.1, this.audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.1);
+                    // Create a more realistic "card snap" sound
+                    oscillator.frequency.setValueAtTime(800, this.audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(200, this.audioContext.currentTime + 0.05);
+                    oscillator.frequency.exponentialRampToValueAtTime(150, this.audioContext.currentTime + 0.08);
+                    gainNode.gain.setValueAtTime(0.08, this.audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.02, this.audioContext.currentTime + 0.05);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.08);
+                    oscillator.type = 'square';
                     oscillator.start();
-                    oscillator.stop(this.audioContext.currentTime + 0.1);
+                    oscillator.stop(this.audioContext.currentTime + 0.08);
                     break;
                 case 'trumpSelect':
                     oscillator.frequency.setValueAtTime(523, this.audioContext.currentTime);

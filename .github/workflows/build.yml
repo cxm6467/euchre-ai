@@ -146,42 +146,54 @@ jobs:
 
       - name: Create Android keystore
         run: |
-          cd android
+          cd android/app
           if [ ! -z "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" ]; then
             echo "Using provided keystore from secrets"
             echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android-keystore.jks
           else
-            echo "Generating new keystore for unsigned release"
-            keytool -genkey -v -keystore android-keystore.jks -alias euchre-key -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Euchre Game, OU=Game Dev, O=Euchre, L=City, S=State, C=US"
+            echo "Generating new debug keystore"
+            keytool -genkey -v \
+              -keystore android-keystore.jks \
+              -alias androiddebugkey \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000 \
+              -storepass android \
+              -keypass android \
+              -dname "CN=Android Debug, O=Android, C=US"
           fi
           
-          # Verify keystore was created in android directory
+          # Verify keystore was created in the correct directory
           if [ ! -f android-keystore.jks ]; then
             echo "Error: Keystore file was not created"
+            ls -la .
+            pwd
             exit 1
           fi
           
-          echo "Keystore created successfully:"
+          echo "Keystore created successfully in android/app/:"
           ls -la android-keystore.jks
-          pwd
 
       - name: Build Android APK
         run: |
           npx cap sync android
           cd android
-          # Create or use the keystore in the android directory
-          if [ -f android-keystore.jks ]; then
-            echo "Using existing keystore"
-          else
-            echo "Generating debug keystore"
-            keytool -genkey -v -keystore android-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias androiddebugkey -storepass android -keypass android -dname "CN=Android Debug,O=Android,C=US"
-          fi
           
-          # Build with the keystore in the android directory
-          ./gradlew assembleRelease -Pandroid.injected.signing.store.file=android-keystore.jks \
-                                   -Pandroid.injected.signing.store.password=android \
-                                   -Pandroid.injected.signing.key.alias=androiddebugkey \
-                                   -Pandroid.injected.signing.key.password=android
+          # Build with the keystore in the android/app directory
+          ./gradlew assembleRelease \
+            -Pandroid.injected.signing.store.file=app/android-keystore.jks \
+            -Pandroid.injected.signing.store.password=android \
+            -Pandroid.injected.signing.key.alias=androiddebugkey \
+            -Pandroid.injected.signing.key.password=android
+            
+          # Verify the APK was built
+          if [ -f "app/build/outputs/apk/release/app-release.apk" ]; then
+            echo "APK built successfully"
+            ls -la app/build/outputs/apk/release/
+          else
+            echo "Error: APK was not generated"
+            exit 1
+          fi
 
       - name: Upload Android APK
         uses: actions/upload-artifact@v4

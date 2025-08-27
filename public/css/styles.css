@@ -7,7 +7,7 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #4a4a4a, #2a2a2a);
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -18,35 +18,28 @@ body {
 .game-container {
     width: 100%;
     max-width: 1400px;
+    display: flex;
     height: 100vh;
-    display: flex;
-    padding: 20px;
-    gap: 20px;
+    background: #1a3f2e;
+    color: white;
     overflow: hidden;
-}
-
-.sidebar {
-    width: 320px;
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 20px;
+    justify-content: center;
+    align-items: center;
     padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
 }
 
 .main-game {
-    flex: 1;
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 20px;
-    padding: 20px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    width: 100%;
+    height: 100%;
+    position: relative;
 }
 
 .game-table {
+    position: relative;
     width: 100%;
     height: 100%;
+    max-width: 100%;
+    max-height: 100%;
     background: radial-gradient(ellipse at center, #2a5f3e, #1a3f2e);
     border-radius: 20px;
     display: flex;
@@ -54,6 +47,256 @@ body {
     align-items: center;
     position: relative;
     box-shadow: inset 0 5px 20px rgba(0,0,0,0.5);
+}
+
+
+.tricks-count {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: white;
+    min-width: 35px;
+    text-align: right;
+}
+
+/* Game Controls */
+.game-controls {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    z-index: 100;
+}
+
+.control-buttons {
+    display: flex;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(5px);
+    border-radius: 30px;
+    padding: 8px 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.new-game-btn {
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.new-game-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.icon-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.icon-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.icon-btn:active {
+    transform: translateY(0);
+}
+
+/* Score Display */
+.score-display {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 100;
+    color: white;
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(5px);
+    border-radius: 15px;
+}
+
+.score-section {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.scores-container {
+    display: flex;
+    gap: 15px;
+    padding: 10px 15px;
+}
+
+.team-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.team {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+}
+
+.team-name {
+    font-size: 0.95em;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.vertical-divider {
+    width: 1px;
+    background: linear-gradient(
+        to bottom,
+        transparent,
+        rgba(255,255,255,0.4),
+        rgba(255,255,255,0.8),
+        rgba(255,255,255,0.4),
+        transparent
+    );
+    position: relative;
+    overflow: hidden;
+    margin: 5px 0;
+    box-shadow: 0 0 8px rgba(255,255,255,0.2);
+}
+
+.vertical-divider::after {
+    content: '';
+    position: absolute;
+    top: -100%;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        to bottom,
+        transparent,
+        rgba(255,255,255,0.6),
+        transparent
+    );
+    animation: shine-vertical 3s infinite;
+}
+
+/* Team and tricks styles now handled in .team class */
+
+.divider {
+    height: 1px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255,255,255,0.2) 20%, 
+        rgba(255,255,255,0.4) 50%, 
+        rgba(255,255,255,0.2) 80%, 
+        transparent 100%);
+    margin: 2px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.divider::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255,255,255,0.4), 
+        transparent);
+    animation: shine 3s infinite;
+}
+
+@keyframes shine {
+    0% { left: -30%; }
+    100% { left: 130%; }
+}
+
+#team1-score, #team2-score {
+    font-weight: bold;
+    color: #ffcc00;
+    text-shadow: 0 0 5px rgba(255, 204, 0, 0.5);
+    margin-left: 4px;
+}
+
+.score-update {
+    animation: scoreUpdate 0.5s ease-in-out;
+}
+
+@keyframes scoreUpdate {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.tricks {
+    padding: 4px 10px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    font-size: 0.9em;
+    font-weight: 500;
+    text-align: center;
+    min-width: 60px;
+    color: rgba(255, 255, 255, 0.95);
+    margin-top: 2px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.tricks span {
+    font-weight: bold;
+    color: #fff;
+}
+
+.tricks::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+    z-index: 0;
+}
+
+.tricks span {
+    position: relative;
+    z-index: 1;
+    display: inline-block;
+    min-width: 1.2em;
+    text-align: center;
+}
+
+/* Animation for when tricks are updated */
+@keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.tricks-update {
+    animation: pop 0.4s ease-out;
 }
 
 /* Player Positioning */
@@ -79,6 +322,11 @@ body {
     align-items: center;
 }
 
+.player-position.bottom, 
+.player-position.top {
+    left: 50%;
+    transform: translateX(-50%);
+}
 .player-position.bottom { bottom: 30px; }
 .player-position.top { top: 80px; }
 .player-position.left { left: 30px; top: 50%; transform: translateY(-50%); }
@@ -94,25 +342,167 @@ body {
     gap: -10px;
 }
 
+/* Improved side player card display - fanned layout */
 .player-position.left .card,
 .player-position.right .card {
-    width: 50px;
-    height: 70px;
-    font-size: 18px;
+    width: 60px;
+    height: 85px;
+    font-size: 16px;
+    position: absolute;
+    transition: all 0.3s ease;
 }
 
-/* Player Avatars */
+
+
+
+
+
+/* Player Avatar Container */
+.player-avatar-container {
+    position: relative;
+}
+
 .player-avatar {
+    position: relative;
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, rgba(74, 107, 255, 0.8), rgba(26, 58, 143, 0.9));
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 36px;
     color: white;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    margin: 0 auto 10px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(2px);
+    cursor: pointer;
+}
+
+.player-avatar:hover {
+    transform: scale(1.05);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Avatar Selector */
+.avatar-selector {
+    position: absolute;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    padding: 10px;
+    display: none;
+    z-index: 1000;
+    gap: 8px;
+    grid-template-columns: repeat(4, 1fr);
+    min-width: 200px;
+}
+
+.avatar-selector.active {
+    display: grid;
+    animation: slideDown 0.2s ease-out;
+}
+
+.player-position.top .avatar-selector {
+    top: 90px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.player-position.bottom .avatar-selector {
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.player-position.left .avatar-selector {
+    left: 90px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.player-position.right .avatar-selector {
+    right: 90px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.avatar-selector .avatar-option {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+    background: rgba(74, 107, 255, 0.1);
+}
+
+.avatar-selector .avatar-option:hover {
+    border-color: #667eea;
+    transform: scale(1.1);
+    background: rgba(74, 107, 255, 0.2);
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.dealer-chip {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background: radial-gradient(circle at 30% 30%, #f5f7fa, #c3cfe2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #2c3e50;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.8);
+    border: 2px solid #fff;
+    z-index: 10;
+    font-size: 14px;
+    text-shadow: 0 1px 1px rgba(255,255,255,0.8);
+    transform: rotate(-10deg);
+}
+
+@keyframes chipPulse {
+    0% { transform: rotate(-10deg) scale(1); }
+    50% { transform: rotate(-10deg) scale(1.1); }
+    100% { transform: rotate(-10deg) scale(1); }
+}
+
+/* Position dealer chip relative to avatar */
+.player-position.bottom .dealer-chip { 
+    top: -10px;
+    right: -10px;
+    left: auto;
+    transform: rotate(-10deg);
+}
+
+.player-position.top .dealer-chip { 
+    bottom: -10px;
+    right: -10px;
+    left: auto;
+    transform: rotate(-10deg);
+}
+
+.player-position.left .dealer-chip { 
+    right: -10px;
+    top: -10px;
+    bottom: auto;
+    transform: rotate(-10deg);
+}
+
+.player-position.right .dealer-chip { 
+    left: -10px;
     transition: transform 0.3s;
 }
 
@@ -155,11 +545,102 @@ body {
 }
 
 .player-name {
-    background: white;
-    padding: 5px 15px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 6px 18px;
     border-radius: 20px;
     font-weight: 600;
+    font-size: 14px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    white-space: nowrap;
     box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    transition: all 0.2s;
+    cursor: pointer;
+    position: relative;
+}
+
+.player-name.editable:hover {
+    background: rgba(0, 0, 0, 0.8);
+    transform: scale(1.05);
+}
+
+.player-name.editable::after {
+    content: '✏️';
+    font-size: 10px;
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.player-name.editable:hover::after {
+    opacity: 1;
+}
+
+.player-avatar::after {
+    content: '✏️';
+    font-size: 16px;
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 10;
+}
+
+.player-avatar:hover::after {
+    opacity: 1;
+}
+
+.player-name-input {
+    background: white;
+    color: #333;
+    border: 2px solid #667eea;
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 14px;
+    font-weight: 600;
+    outline: none;
+    text-align: center;
+    max-width: 120px;
+}
+
+/* Fix spacing for side players - horizontal stacked cards */
+.player-position.left .player-cards,
+.player-position.right .player-cards {
+    flex-direction: row;
+    gap: 0;
+    width: auto;
+    height: auto;
+}
+
+.player-position.left .card,
+.player-position.right .card {
+    margin: 0 -15px;
+    position: relative;
+}
+
+.player-position.left .card:first-child,
+.player-position.right .card:first-child {
+    margin-left: 0;
+}
+
+.player-position.left .card:last-child,
+.player-position.right .card:last-child {
+    margin-right: 0;
+}
+
+.player-position.left,
+.player-position.right {
+    gap: 15px;
 }
 
 /* Cards */
@@ -170,23 +651,131 @@ body {
 }
 
 .card {
-    width: 70px;
-    height: 100px;
+    width: 80px;
+    height: 120px;
     background: white;
     border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    cursor: pointer;
-    transition: transform 0.2s;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    margin: 0 -15px;
+    transition: all 0.3s;
     position: relative;
+    cursor: pointer;
+    flex-shrink: 0;
+    border: 2px solid #ddd;
+}
+
+/* Make your hand (south) cards bigger */
+.player-position.bottom .card {
+    width: 100px;
+    height: 150px;
+    margin: 0 -20px;
+}
+
+.player-position.bottom .card-corner .rank {
+    font-size: 18px;
+}
+
+.player-position.bottom .card-corner .suit {
+    font-size: 16px;
+}
+
+.player-position.bottom .card-center {
+    font-size: 46px;
+}
+
+.card-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding: 4px;
+}
+
+.card-corner {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1;
+}
+
+.card-corner.top-left {
+    top: 4px;
+    left: 4px;
+}
+
+.card-corner.bottom-right {
+    bottom: 4px;
+    right: 4px;
+}
+
+.card-corner .rank {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.card-corner .suit {
+    font-size: 12px;
+    margin-top: -2px;
+}
+
+.card-corner.bottom-right .rank,
+.card-corner.bottom-right .suit {
+    transform: rotate(180deg);
+}
+
+.card-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 36px;
+    font-weight: bold;
 }
 
 .card:hover { 
     transform: translateY(-15px);
     z-index: 10;
+}
+
+.card.disabled {
+    opacity: 0.4;
+    filter: grayscale(80%);
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.card.disabled:hover {
+    transform: none;
+    z-index: auto;
+}
+
+.card.playable {
+    position: relative;
+}
+
+.card.playable::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #27ae60, #2ecc71);
+    border-radius: 10px;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.card.must-follow .card.playable::before {
+    opacity: 0.6;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.3; }
+    50% { opacity: 0.8; }
+    100% { opacity: 0.3; }
 }
 
 .card.back {
@@ -196,12 +785,21 @@ body {
 
 .card.back.classic {
     background: 
-        radial-gradient(circle at 25% 25%, rgba(255,255,255,0.2) 2px, transparent 2px),
-        radial-gradient(circle at 75% 75%, rgba(255,255,255,0.15) 1px, transparent 1px),
-        linear-gradient(45deg, #1e3c72 25%, transparent 25%),
-        linear-gradient(-45deg, #2a5298 25%, transparent 25%),
-        linear-gradient(135deg, #1e3c72, #2a5298);
-    background-size: 20px 20px, 15px 15px, 10px 10px, 10px 10px, 100% 100%;
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3) 2px, transparent 2px),
+        radial-gradient(circle at 70% 70%, rgba(255,255,255,0.2) 1px, transparent 1px),
+        repeating-linear-gradient(45deg, 
+            rgba(255,255,255,0.1) 0px, 
+            rgba(255,255,255,0.1) 1px, 
+            transparent 1px, 
+            transparent 6px),
+        repeating-linear-gradient(-45deg, 
+            rgba(255,255,255,0.1) 0px, 
+            rgba(255,255,255,0.1) 1px, 
+            transparent 1px, 
+            transparent 6px),
+        linear-gradient(135deg, #4a6bff, #1a3a8f);
+    background-size: 25px 25px, 20px 20px, 8px 8px, 8px 8px, 100% 100%;
+    border: 2px solid rgba(255,255,255,0.3);
 }
 
 .card.back.red {
@@ -259,13 +857,15 @@ body {
 
 /* Center Area and Trick Cards */
 .center-area {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     width: 300px;
     height: 200px;
     display: flex;
     justify-content: center;
     align-items: center;
-    position: relative;
-    margin-top: 30px;
 }
 
 .trick-card {
@@ -279,22 +879,49 @@ body {
     justify-content: center;
     font-size: 28px;
     position: absolute;
-    transition: all 0.5s;
+    transition: all 0.5s ease;
 }
 
-/* Position cards closer to players */
-.trick-card.player-west { transform: translate(-120px, -10px) rotate(-3deg); }
-.trick-card.player-north { transform: translate(-10px, -100px) rotate(2deg); }
-.trick-card.player-east { transform: translate(120px, -10px) rotate(1deg); }
-.trick-card.player-south { transform: translate(-10px, 90px) rotate(-1deg); }
+/* Position cards around the center area */
+.trick-card.player-west { 
+    transform: translate(-120px, -10px) rotate(-3deg);
+}
+.trick-card.player-north { 
+    transform: translate(-10px, -100px) rotate(2deg);
+}
+.trick-card.player-east { 
+    transform: translate(120px, -10px) rotate(1deg);
+}
+.trick-card.player-south { 
+    transform: translate(-10px, 90px) rotate(-1deg);
+}
+
+/* Score Display - Apple-style dark/transparent look */
+.score-display {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.75);
+    color: white;
+    border-radius: 16px;
+    font-size: 14px;
+    z-index: 100;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    overflow: hidden;
+    min-width: 240px;
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
 
 /* Trump Display */
 .trump-display {
     position: absolute;
-    top: 10px;
+    top: 15px;
     left: 50%;
     transform: translateX(-50%);
     background: white;
+    color: #2c3e50;
     padding: 12px 35px;
     border-radius: 25px;
     font-size: 22px;
@@ -302,6 +929,68 @@ body {
     box-shadow: 0 6px 20px rgba(0,0,0,0.4);
     z-index: 50;
     border: 3px solid #667eea;
+    text-align: center;
+    min-width: 200px;
+}
+
+/* Turn Indicator */
+.turn-indicator {
+    position: absolute;
+    top: 75px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 14px;
+    box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+    z-index: 49;
+    display: none;
+    align-items: center;
+    gap: 8px;
+    animation: turnPulse 2s infinite;
+}
+
+.turn-indicator.active {
+    display: flex;
+}
+
+.turn-arrow {
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 8px solid white;
+    animation: bounce 1.5s infinite;
+}
+
+.turn-indicator.pointing-north .turn-arrow {
+    transform: rotate(0deg);
+}
+
+.turn-indicator.pointing-east .turn-arrow {
+    transform: rotate(90deg);
+}
+
+.turn-indicator.pointing-south .turn-arrow {
+    transform: rotate(180deg);
+}
+
+.turn-indicator.pointing-west .turn-arrow {
+    transform: rotate(270deg);
+}
+
+@keyframes turnPulse {
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 1; }
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-3px); }
+    60% { transform: translateY(-1px); }
 }
 
 /* Scoreboard */
@@ -379,7 +1068,7 @@ body {
 /* Messages */
 .message {
     position: absolute;
-    top: 40%;
+    top: 30%;
     left: 50%;
     transform: translate(-50%, -50%);
     background: rgba(0,0,0,0.85);
@@ -457,6 +1146,70 @@ body {
     border-color: #667eea;
     transform: scale(1.1);
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+/* Mini card for trump selection */
+.mini-card {
+    width: 60px;
+    height: 90px;
+    background: white;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    position: relative;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.mini-card-corner {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1;
+}
+
+.mini-card-corner.top-left {
+    top: 3px;
+    left: 3px;
+}
+
+.mini-card-corner.bottom-right {
+    bottom: 3px;
+    right: 3px;
+}
+
+.mini-rank {
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.mini-suit {
+    font-size: 10px;
+    margin-top: -1px;
+}
+
+.mini-card-corner.bottom-right .mini-rank,
+.mini-card-corner.bottom-right .mini-suit {
+    transform: rotate(180deg);
+}
+
+.mini-card-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.trump-card-option {
+    padding: 8px;
+    border: 3px solid transparent;
+    background: none !important;
+}
+
+.trump-card-option:hover {
+    background: none !important;
+    border-color: #667eea;
 }
 
 .pass-btn {
@@ -539,6 +1292,60 @@ body {
     display: block;
 }
 
+/* Kitty Display */
+.kitty-display {
+    position: absolute;
+    bottom: 140px;
+    left: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 15px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    display: none;
+    min-width: 120px;
+}
+
+.kitty-display.active {
+    display: block;
+}
+
+.kitty-display h4 {
+    margin-bottom: 10px;
+    color: #333;
+    font-size: 16px;
+    text-align: center;
+}
+
+.kitty-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.kitty-cards {
+    display: flex;
+    gap: -5px;
+}
+
+.kitty-card {
+    width: 30px;
+    height: 42px;
+    background: linear-gradient(135deg, #4a6bff, #1a3a8f);
+    border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.3);
+    margin: 0 -3px;
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.kitty-count {
+    font-size: 12px;
+    color: #666;
+    text-align: center;
+    font-weight: 500;
+}
+
 .flipped-card-display h4 {
     margin-bottom: 10px;
     color: #333;
@@ -559,14 +1366,25 @@ body {
     background: white;
     border-radius: 8px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
     border: 3px solid #667eea;
     position: relative;
 }
 
+.flipped-card .card-content {
+    padding: 2px;
+}
+
+.flipped-card .card-corner .rank {
+    font-size: 10px;
+}
+
+.flipped-card .card-corner .suit {
+    font-size: 8px;
+}
+
+.flipped-card .card-center {
+    font-size: 28px;
+}
 
 /* Dealer discard selection */
 .dealer-discard {
@@ -655,15 +1473,16 @@ body {
 }
 
 .player-customization {
-    margin-bottom: 25px;
+    margin-bottom: 20px;
     padding: 15px;
-    border: 2px solid #f0f0f0;
+    background: rgba(255, 255, 255, 0.1);
     border-radius: 10px;
+    position: relative;
 }
 
-.player-customization h4 {
-    margin-bottom: 15px;
-    color: #555;
+.name-input-container {
+    position: relative;
+    margin-bottom: 5px;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -792,6 +1611,222 @@ body {
     background: #5a6268;
 }
 
+/* New Game Confirmation Modal */
+.new-game-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    z-index: 300;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.new-game-modal.active {
+    display: flex;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.new-game-modal .modal-content {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    max-width: 400px;
+}
+
+.new-game-modal h3 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 24px;
+}
+
+.new-game-modal p {
+    color: #666;
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.confirm-btn {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.confirm-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+}
+
+.cancel-btn {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.cancel-btn:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+}
+
+/* Help Modal */
+.help-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    z-index: 250;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.help-modal.active {
+    display: flex;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.help-content {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow: hidden;
+    position: relative;
+}
+
+.help-header {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 20px 30px;
+    border-radius: 20px 20px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.help-header h2 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 32px;
+    cursor: pointer;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.close-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+.help-body {
+    padding: 30px;
+    color: #333;
+}
+
+.help-section {
+    margin-bottom: 25px;
+}
+
+.help-section:last-child {
+    margin-bottom: 0;
+}
+
+.help-section h3 {
+    color: #667eea;
+    margin-bottom: 12px;
+    font-size: 18px;
+    border-bottom: 2px solid #f0f4ff;
+    padding-bottom: 8px;
+}
+
+.help-section p {
+    line-height: 1.6;
+    margin-bottom: 10px;
+}
+
+.help-section ul,
+.help-section ol {
+    line-height: 1.6;
+    margin-left: 20px;
+    margin-bottom: 10px;
+}
+
+.help-section li {
+    margin-bottom: 5px;
+}
+
+.help-section strong {
+    color: #667eea;
+}
+
+.help-footer {
+    background: #f8f9fa;
+    padding: 15px 30px;
+    border-radius: 0 0 20px 20px;
+    border-top: 1px solid #e9ecef;
+    text-align: center;
+}
+
+.help-footer a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.help-footer a:hover {
+    color: #5a67d8;
+    text-decoration: underline;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
 /* Loading screen */
 .loading {
     position: fixed;
@@ -868,15 +1903,21 @@ body {
     }
     
     /* Adjust player positions for mobile */
+    .player-position.bottom,
+    .player-position.top {
+        left: 50%;
+        transform: translateX(-50%);
+    }
     .player-position.top { top: 50px; }
     .player-position.bottom { bottom: 15px; }
-    .player-position.left { left: 15px; }
-    .player-position.right { right: 15px; }
+    .player-position.left { left: 15px; transform: translateY(-50%); }
+    .player-position.right { right: 15px; transform: translateY(-50%); }
     
     .player-avatar {
         width: 60px;
         height: 60px;
         font-size: 28px;
+        background: linear-gradient(135deg, rgba(74, 107, 255, 0.8), rgba(26, 58, 143, 0.9));
     }
     
     .player-name {
@@ -905,10 +1946,10 @@ body {
     }
     
     /* Adjust trick card positions for mobile */
-    .trick-card.player-west { transform: translate(-80px, -5px) rotate(-3deg); }
-    .trick-card.player-north { transform: translate(-5px, -70px) rotate(2deg); }
-    .trick-card.player-east { transform: translate(80px, -5px) rotate(1deg); }
-    .trick-card.player-south { transform: translate(-5px, 65px) rotate(-1deg); }
+    .trick-card.player-west { transform: translate(-100px, -5px) rotate(-4deg); }
+    .trick-card.player-north { transform: translate(-5px, -90px) rotate(3deg); }
+    .trick-card.player-east { transform: translate(100px, -5px) rotate(2deg); }
+    .trick-card.player-south { transform: translate(-5px, 85px) rotate(-2deg); }
     
     .trump-display {
         font-size: 16px;
@@ -918,11 +1959,39 @@ body {
     
     /* Mobile-friendly dialogs */
     .trump-selection,
-    .settings-panel {
+    .settings-panel,
+    .help-content {
         width: 95%;
         max-width: none;
-        padding: 20px;
+        padding: 0;
         max-height: 90vh;
+    }
+    
+    .trump-selection,
+    .settings-panel {
+        padding: 20px;
+    }
+    
+    .help-content {
+        border-radius: 15px;
+    }
+    
+    .help-header {
+        border-radius: 15px 15px 0 0;
+        padding: 15px 20px;
+    }
+    
+    .help-header h2 {
+        font-size: 20px;
+    }
+    
+    .help-body {
+        padding: 20px;
+    }
+    
+    .help-footer {
+        border-radius: 0 0 15px 15px;
+        padding: 12px 20px;
     }
     
     .trump-option {
@@ -989,6 +2058,7 @@ body {
         width: 50px;
         height: 50px;
         font-size: 24px;
+        background: linear-gradient(135deg, rgba(74, 107, 255, 0.8), rgba(26, 58, 143, 0.9));
     }
     
     .player-name {

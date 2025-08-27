@@ -158,14 +158,14 @@ class EuchreGame {
     dealCards() {
         this.createDeck();
         
-        // Clear previous cards and tricks
+        // Clear previous cards and reset tricks
         ['north', 'east', 'south', 'west'].forEach(pos => {
             this.players[pos].cards = [];
             this.players[pos].tricks = 0;
         });
         
-        // Reset tricks display
-        this.updateTricksDisplay();
+        // Update display to show reset tricks
+        this.updateScore();
         
         // Deal 5 cards to each player in clockwise order (left of dealer first)
         const dealerOrder = ['south', 'west', 'north', 'east'];
@@ -199,9 +199,22 @@ class EuchreGame {
         // Remaining cards become the kitty
         this.kitty = [...this.deck];
         
+        // Debug: Check card counts
+        console.log('🃏 ═══════════ CARD DEAL SUMMARY ═══════════');
+        ['south', 'west', 'north', 'east'].forEach(pos => {
+            const player = this.playerSettings[pos]?.name || pos;
+            const avatar = this.playerSettings[pos]?.avatar || '🤖';
+            console.log(`${avatar} ${player.padEnd(15)} │ ${this.players[pos].cards.length} cards`);
+        });
+        console.log('────────────────────────────────────────────');
+        console.log(`🎯 Flipped card: ${this.flippedCard ? `${this.flippedCard.rank}${this.flippedCard.suit}` : 'None'}`);
+        console.log(`🃟 Kitty: ${this.kitty.length} cards remaining`);
+        console.log('═══════════════════════════════════════════');
+        
         this.displayCards();
         this.displayFlippedCard();
-        this.updateTricksDisplay();
+        this.displayKitty();
+        this.updateScore();
         this.startTrumpSelection();
         
         this.stats.handsPlayed++;
@@ -213,16 +226,55 @@ class EuchreGame {
         ['north', 'east', 'south', 'west'].forEach(position => {
             const container = document.getElementById(`${position}-cards`);
             container.innerHTML = '';
+            // Clear must-follow class from container
+            container.classList.remove('must-follow');
             
             this.players[position].cards.forEach((card, index) => {
                 const cardDiv = document.createElement('div');
                 cardDiv.className = 'card';
                 
                 if (position === 'south') {
-                    cardDiv.innerHTML = `<span style="color:${card.color}; font-weight: bold;">${card.rank}${card.suit}</span>`;
-                    cardDiv.onclick = () => this.playCard(position, index);
+                    cardDiv.innerHTML = `
+                        <div class="card-content">
+                            <div class="card-corner top-left">
+                                <div class="rank" style="color:${card.color}">${card.rank}</div>
+                                <div class="suit" style="color:${card.color}">${card.suit}</div>
+                            </div>
+                            <div class="card-center" style="color:${card.color}">
+                                ${card.suit}
+                            </div>
+                            <div class="card-corner bottom-right">
+                                <div class="rank rotated" style="color:${card.color}">${card.rank}</div>
+                                <div class="suit rotated" style="color:${card.color}">${card.suit}</div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Only apply visual states when it's the human player's turn
+                    if (this.currentPlayer === 'south') {
+                        const isPlayable = this.isCardPlayable(card, position);
+                        const mustFollowSuit = this.currentTrick.length > 0;
+                        
+                        console.log(`🃏 Card ${card.rank}${card.suit} - Playable: ${isPlayable ? '✅' : '❌'}`);
+                        
+                        if (!isPlayable) {
+                            cardDiv.classList.add('disabled');
+                            console.log(`🚫 Disabled card: ${card.rank}${card.suit}`);
+                        } else if (mustFollowSuit) {
+                            cardDiv.classList.add('playable');
+                            container.classList.add('must-follow');
+                            console.log(`✨ Playable card: ${card.rank}${card.suit}`);
+                        }
+                        
+                        if (isPlayable) {
+                            cardDiv.onclick = () => this.playCard(position, index);
+                        }
+                    } else {
+                        // Always clickable when not player's turn (for normal game flow)
+                        cardDiv.onclick = () => this.playCard(position, index);
+                    }
                 } else {
-                    cardDiv.className = `card back ${this.cardBackStyle}`;
+                    cardDiv.className = 'card back classic';
                 }
                 
                 container.appendChild(cardDiv);
@@ -290,7 +342,22 @@ class EuchreGame {
             // First round: AI chance to order up flipped card based on difficulty
             if (Math.random() < aiSettings.trump1) {
                 this.selectTrump(this.flippedCard.suit);
-                this.showMessage(`${playerName} ordered up ${this.flippedCard.suit}!`);
+                
+                // Check if AI should go alone - higher chance for partner (north), lower for opponents
+                let aloneChance = 0;
+                if (this.trumpSelectionPlayer === 'north') {
+                    aloneChance = 0.15; // 15% chance for partner
+                } else if (this.trumpSelectionPlayer === 'east' || this.trumpSelectionPlayer === 'west') {
+                    aloneChance = 0.08; // 8% chance for opponents
+                }
+                
+                if (Math.random() < aloneChance) {
+                    this.playingAlone = true;
+                    this.alonePlayer = this.trumpSelectionPlayer;
+                    this.showMessage(`${playerName} ordered up the ${this.flippedCard.rank}${this.flippedCard.suit} and is going alone! 🎯`);
+                } else {
+                    this.showMessage(`${playerName} ordered up the ${this.flippedCard.rank}${this.flippedCard.suit}!`);
+                }
                 return;
             } else {
                 this.showMessage(`${playerName} passes.`);
@@ -310,7 +377,22 @@ class EuchreGame {
                     const availableSuits = ['♠', '♥', '♦', '♣'].filter(s => s !== this.flippedCard.suit);
                     const chosenSuit = availableSuits[Math.floor(Math.random() * availableSuits.length)];
                     this.selectTrump(chosenSuit);
-                    this.showMessage(`${playerName} called ${chosenSuit} trump!`);
+                    
+                    // Check if AI should go alone - lower chances in round 2
+                    let aloneChance = 0;
+                    if (this.trumpSelectionPlayer === 'north') {
+                        aloneChance = 0.10; // 10% chance for partner
+                    } else if (this.trumpSelectionPlayer === 'east' || this.trumpSelectionPlayer === 'west') {
+                        aloneChance = 0.05; // 5% chance for opponents
+                    }
+                    
+                    if (Math.random() < aloneChance) {
+                        this.playingAlone = true;
+                        this.alonePlayer = this.trumpSelectionPlayer;
+                        this.showMessage(`${playerName} called ${chosenSuit} trump and is going alone! 🎯`);
+                    } else {
+                        this.showMessage(`${playerName} called ${chosenSuit} trump!`);
+                    }
                     return;
                 } else {
                     this.showMessage(`${playerName} passes.`);
@@ -359,11 +441,23 @@ class EuchreGame {
         const aloneOption = document.getElementById('alone-option');
         
         if (firstRound) {
-            // First round: show flipped suit only
+            // First round: show mini card version
             options.innerHTML = `
-                <div class="trump-option" onclick="game.selectTrump('${this.flippedCard.suit}')" style="color: ${this.flippedCard.color}">${this.flippedCard.suit}</div>
+                <div class="trump-option trump-card-option" onclick="game.selectTrump('${this.flippedCard.suit}')">
+                    <div class="mini-card" style="color: ${this.flippedCard.color}; border-color: ${this.flippedCard.color};">
+                        <div class="mini-card-corner top-left">
+                            <div class="mini-rank">${this.flippedCard.rank}</div>
+                            <div class="mini-suit">${this.flippedCard.suit}</div>
+                        </div>
+                        <div class="mini-card-center">${this.flippedCard.suit}</div>
+                        <div class="mini-card-corner bottom-right">
+                            <div class="mini-rank rotated">${this.flippedCard.rank}</div>
+                            <div class="mini-suit rotated">${this.flippedCard.suit}</div>
+                        </div>
+                    </div>
+                </div>
             `;
-            dialog.querySelector('h3').textContent = `Order up ${this.flippedCard.suit}?`;
+            dialog.querySelector('h3').textContent = `Order up the ${this.flippedCard.rank}${this.flippedCard.suit}?`;
         } else {
             // Second round: all suits except flipped
             const availableSuits = [
@@ -410,6 +504,7 @@ class EuchreGame {
         // AI selected trump - now handle dealer pickup
         this.trumpSelectionPhase = false;
         this.hideTrumpSelection();
+        this.hideKitty();
         
         document.getElementById('trump-display').innerHTML = 
             `Trump: <span style="color: ${suit === '♥' || suit === '♦' ? '#e74c3c' : '#2c3e50'}">${suit}</span>`;
@@ -428,6 +523,7 @@ class EuchreGame {
         this.alonePlayer = 'south';
         this.trumpSelectionPhase = false;
         this.hideTrumpSelection();
+        this.hideKitty();
         
         // Mark partner as sitting out
         document.getElementById('north-avatar').classList.add('sitting-out');
@@ -454,8 +550,11 @@ class EuchreGame {
             this.currentPlayer = dealerOrder[(dealerIndex + 1) % 4];
             
             // Skip partner if playing alone
-            if (this.playingAlone && this.alonePlayer === 'south' && this.currentPlayer === 'north') {
-                this.currentPlayer = dealerOrder[(dealerIndex + 2) % 4];
+            if (this.playingAlone) {
+                const alonePlayerPartner = this.getPartner(this.alonePlayer);
+                if (this.currentPlayer === alonePlayerPartner) {
+                    this.currentPlayer = dealerOrder[(dealerIndex + 2) % 4];
+                }
             }
             
             if (this.players[this.currentPlayer].isAI) {
@@ -470,6 +569,7 @@ class EuchreGame {
         // Player chose trump but not alone
         this.trumpSelectionPhase = false;
         this.hideTrumpSelection();
+        this.hideKitty();
         
         // Handle dealer pickup if trump was selected in first round
         if (this.trumpSelectionRound === 1) {
@@ -498,12 +598,42 @@ class EuchreGame {
         }
         
         // Skip if partner is trying to play when someone is alone
-        if (this.playingAlone && this.alonePlayer === 'south' && player === 'north') {
-            this.showMessage("Your partner sits out when you play alone!");
-            return;
+        if (this.playingAlone) {
+            const alonePlayerPartner = this.getPartner(this.alonePlayer);
+            if (player === alonePlayerPartner) {
+                const alonePlayerName = this.playerSettings[this.alonePlayer].name;
+                if (player === 'south') {
+                    this.showMessage(`Your partner ${alonePlayerName} is playing alone!`);
+                } else {
+                    this.showMessage(`${this.playerSettings[player].name} sits out while ${alonePlayerName} plays alone.`);
+                }
+                return;
+            }
         }
         
         const card = this.players[player].cards[cardIndex];
+        
+        // Check if player must follow suit (only applies to human player)
+        if (player === 'south' && this.currentTrick.length > 0) {
+            const leadCard = this.currentTrick[0].card;
+            const leadSuit = this.getEffectiveSuit(leadCard);
+            const canFollow = this.canFollowSuit(this.players[player].cards, leadSuit);
+            const playedCardSuit = this.getEffectiveSuit(card);
+            
+            console.log(`⚖️ ────── SUIT ENFORCEMENT CHECK ──────`);
+            console.log(`🎯 Lead card: ${leadCard.rank}${leadCard.suit} (effective: ${leadSuit})`);
+            console.log(`🎴 Played card: ${card.rank}${card.suit} (effective: ${playedCardSuit})`);
+            console.log(`🤔 Can follow suit: ${canFollow ? '✅ Yes' : '❌ No'}`);
+            
+            if (canFollow && playedCardSuit !== leadSuit) {
+                console.log(`🚫 ILLEGAL PLAY: Must follow ${leadSuit}!`);
+                this.showMessage(`You must follow suit (${leadSuit})!`);
+                return;
+            }
+            console.log(`✅ Legal play accepted`);
+            console.log(`──────────────────────────────────────`);
+        }
+        
         this.players[player].cards.splice(cardIndex, 1);
         
         this.currentTrick.push({ player, card });
@@ -521,24 +651,52 @@ class EuchreGame {
     
     displayTrick() {
         const centerArea = document.getElementById('center-area');
-        centerArea.innerHTML = '';
+        if (!centerArea) return; // Exit if center area doesn't exist
         
-        this.currentTrick.forEach((play, index) => {
-            const cardDiv = document.createElement('div');
-            cardDiv.className = `trick-card player-${play.player}`;
-            cardDiv.innerHTML = `<span style="color:${play.card.color}; font-weight: bold;">${play.card.rank}${play.card.suit}</span>`;
+        try {
+            centerArea.innerHTML = '';
             
-            // Add player name label
-            const playerLabel = document.createElement('div');
-            playerLabel.style.cssText = 'position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); font-size: 12px; color: white; background: rgba(0,0,0,0.7); padding: 2px 8px; border-radius: 10px; white-space: nowrap;';
-            playerLabel.textContent = this.playerSettings[play.player].name;
-            cardDiv.appendChild(playerLabel);
+            if (!this.currentTrick || !Array.isArray(this.currentTrick)) return;
             
-            centerArea.appendChild(cardDiv);
-        });
-        
-        // Update tricks display after each card is played
-        this.updateTricksDisplay();
+            this.currentTrick.forEach((play, index) => {
+                if (!play || !play.card || !play.player) return;
+                
+                const cardDiv = document.createElement('div');
+                cardDiv.className = `trick-card player-${play.player}`;
+                
+                cardDiv.innerHTML = `
+                    <div class="card-content">
+                        <div class="card-corner top-left">
+                            <div class="rank" style="color:${play.card.color || '#000'}">${play.card.rank || ''}</div>
+                            <div class="suit" style="color:${play.card.color || '#000'}">${play.card.suit || ''}</div>
+                        </div>
+                        <div class="card-center" style="color:${play.card.color || '#000'}">
+                            ${play.card.suit || ''}
+                        </div>
+                        <div class="card-corner bottom-right">
+                            <div class="rank rotated" style="color:${play.card.color || '#000'}">${play.card.rank || ''}</div>
+                            <div class="suit rotated" style="color:${play.card.color || '#000'}">${play.card.suit || ''}</div>
+                        </div>
+                    </div>
+                `;
+                
+                // Add player name label if player exists in settings
+                if (this.playerSettings[play.player]) {
+                    const playerLabel = document.createElement('div');
+                    playerLabel.style.cssText = 'position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); font-size: 12px; color: white; background: rgba(0,0,0,0.7); padding: 2px 8px; border-radius: 10px; white-space: nowrap;';
+                    playerLabel.textContent = this.playerSettings[play.player].name || play.player;
+                    cardDiv.appendChild(playerLabel);
+                }
+                
+                centerArea.appendChild(cardDiv);
+            });
+            
+            // Update score display to reflect any trick count changes
+            this.updateScore();
+            
+        } catch (error) {
+            console.error('Error displaying trick:', error);
+        }
     }
     
     nextPlayer() {
@@ -547,14 +705,27 @@ class EuchreGame {
         this.currentPlayer = players[(currentIndex + 1) % 4];
         
         // Skip partner if playing alone
-        if (this.playingAlone && this.alonePlayer === 'south' && this.currentPlayer === 'north') {
-            this.currentPlayer = players[(players.indexOf(this.currentPlayer) + 1) % 4];
+        if (this.playingAlone) {
+            const alonePlayerPartner = this.getPartner(this.alonePlayer);
+            if (this.currentPlayer === alonePlayerPartner) {
+                this.currentPlayer = players[(players.indexOf(this.currentPlayer) + 1) % 4];
+            }
         }
+        
+        // Update turn indicator
+        this.updateTurnIndicator();
         
         if (this.players[this.currentPlayer].isAI) {
             setTimeout(() => this.aiPlay(), 1000);
         } else if (this.currentPlayer === 'south') {
+            // Update card display to show playable/disabled states on human turn
+            this.displayCards();
             this.showMessage("Your turn! Click a card to play.");
+        }
+        
+        // Always update display when player changes (clears visual states when not human turn)
+        if (this.currentPlayer !== 'south') {
+            this.displayCards();
         }
     }
     
@@ -565,36 +736,27 @@ class EuchreGame {
         if (cards.length === 0) return;
         
         // Skip if this is the partner of someone playing alone
-        if (this.playingAlone && this.alonePlayer === 'south' && player === 'north') {
-            this.nextPlayer();
-            return;
+        if (this.playingAlone) {
+            const alonePlayerPartner = this.getPartner(this.alonePlayer);
+            if (player === alonePlayerPartner) {
+                this.nextPlayer();
+                return;
+            }
         }
         
         // Improved AI: follow suit if possible, otherwise play lowest card
         let cardIndex = 0;
         
         if (this.currentTrick.length > 0) {
-            const leadSuit = this.currentTrick[0].card.suit;
-            const followCards = cards.filter((card, idx) => {
-                // Can follow suit
-                if (card.suit === leadSuit) return true;
-                // Left bower of trump can follow trump lead
-                if (leadSuit === this.trump) {
-                    const sameColor = (this.trump === '♠' && card.suit === '♣') ||
-                                    (this.trump === '♣' && card.suit === '♠') ||
-                                    (this.trump === '♥' && card.suit === '♦') ||
-                                    (this.trump === '♦' && card.suit === '♥');
-                    return card.rank === 'J' && sameColor;
-                }
-                return false;
-            });
+            const leadSuit = this.getEffectiveSuit(this.currentTrick[0].card);
+            const followCards = cards.filter(card => this.getEffectiveSuit(card) === leadSuit);
             
             if (followCards.length > 0) {
-                // Play lowest following card
+                // Must follow suit - play lowest following card
                 const followCard = followCards[0];
                 cardIndex = cards.indexOf(followCard);
             } else {
-                // Play lowest card
+                // Cannot follow suit - play lowest card (or trump if advantageous)
                 cardIndex = 0;
             }
         } else {
@@ -605,6 +767,78 @@ class EuchreGame {
         this.playCard(player, cardIndex);
     }
     
+    /**
+     * Get the effective suit of a card, considering bower rules
+     * Left bower (Jack of same color as trump) becomes trump suit
+     * @param {Object} card - Card object with rank and suit properties
+     * @returns {string} Effective suit for following purposes
+     */
+    getEffectiveSuit(card) {
+        if (!this.trump || !card) return card?.suit || '';
+        
+        // Right bower (Jack of trump suit) is trump
+        if (card.rank === 'J' && card.suit === this.trump) {
+            return this.trump;
+        }
+        
+        // Left bower (Jack of same color as trump) becomes trump
+        if (card.rank === 'J') {
+            const sameColor = (this.trump === '♠' && card.suit === '♣') ||
+                            (this.trump === '♣' && card.suit === '♠') ||
+                            (this.trump === '♥' && card.suit === '♦') ||
+                            (this.trump === '♦' && card.suit === '♥');
+            if (sameColor) {
+                return this.trump;
+            }
+        }
+        
+        return card.suit;
+    }
+    
+    /**
+     * Check if a player can follow the lead suit
+     * @param {Array} hand - Player's cards
+     * @param {string} leadSuit - The suit that was led
+     * @returns {boolean} True if player has cards of the lead suit
+     */
+    canFollowSuit(hand, leadSuit) {
+        return hand.some(card => this.getEffectiveSuit(card) === leadSuit);
+    }
+    
+    /**
+     * Check if a specific card is playable given the current trick state
+     * @param {Object} card - The card to check
+     * @param {string} player - The player trying to play the card
+     * @returns {boolean} True if the card can be legally played
+     */
+    isCardPlayable(card, player) {
+        // If it's not the player's turn, no cards are playable
+        if (this.currentPlayer !== player) {
+            return false;
+        }
+        
+        // If no cards have been played in this trick, any card is playable
+        if (this.currentTrick.length === 0) {
+            return true;
+        }
+        
+        // Get the lead suit
+        const leadSuit = this.getEffectiveSuit(this.currentTrick[0].card);
+        const playerHand = this.players[player].cards;
+        
+        // Check if player can follow suit
+        const canFollow = this.canFollowSuit(playerHand, leadSuit);
+        
+        // If player can't follow suit, any card is playable
+        if (!canFollow) {
+            return true;
+        }
+        
+        // If player can follow suit, only cards of the lead suit are playable
+        const cardSuit = this.getEffectiveSuit(card);
+        return cardSuit === leadSuit;
+    }
+
     /**
      * Calculate the value of a card in Euchre with proper bower hierarchy
      * Right bower (Jack of trump) is highest, left bower (Jack of same color) is second
@@ -646,51 +880,92 @@ class EuchreGame {
     }
     
     evaluateTrick() {
-        if (this.currentTrick.length === 0) return;
-        
-        const leadSuit = this.currentTrick[0].card.suit;
-        let winner = this.currentTrick[0];
-        let highestValue = this.getCardValue(winner.card, this.trump, leadSuit);
-        
-        for (let i = 1; i < this.currentTrick.length; i++) {
-            const cardValue = this.getCardValue(this.currentTrick[i].card, this.trump, leadSuit);
-            if (cardValue > highestValue) {
-                highestValue = cardValue;
-                winner = this.currentTrick[i];
+        try {
+            if (!this.currentTrick || this.currentTrick.length === 0) return;
+            
+            // Ensure we have a valid first card
+            if (!this.currentTrick[0]?.card?.suit) {
+                console.error('Invalid first card in trick');
+                return;
             }
+            
+            const leadSuit = this.currentTrick[0].card.suit;
+            let winner = this.currentTrick[0];
+            let highestValue = this.getCardValue(winner.card, this.trump, leadSuit);
+            
+            // Find the winning card in the trick
+            for (let i = 1; i < this.currentTrick.length; i++) {
+                if (!this.currentTrick[i]?.card) continue;
+                
+                const cardValue = this.getCardValue(this.currentTrick[i].card, this.trump, leadSuit);
+                if (cardValue > highestValue) {
+                    highestValue = cardValue;
+                    winner = this.currentTrick[i];
+                }
+            }
+            
+            // Update tricks for the winning player
+            if (winner?.player && this.players[winner.player]) {
+                this.players[winner.player].tricks = (this.players[winner.player].tricks || 0) + 1;
+                
+                // Update the score display
+                this.updateScore();
+                
+                // Show winner message
+                const winnerName = this.playerSettings[winner.player]?.name || winner.player;
+                this.showMessage(`${winnerName} wins the trick!`);
+                
+                // Clear trick and handle next turn
+                setTimeout(() => this.processTrickCompletion(winner), 2000);
+            } else {
+                console.error('Could not determine trick winner');
+                this.currentTrick = [];
+            }
+        } catch (error) {
+            console.error('Error evaluating trick:', error);
+            this.currentTrick = [];
+            this.nextPlayer();
+        }
+    }
+    
+    processTrickCompletion(winner) {
+        const centerArea = document.getElementById('center-area');
+        if (centerArea) centerArea.innerHTML = '';
+        
+        this.currentTrick = [];
+        
+        // Check if hand is over
+        if (this.players.south?.cards?.length === 0) {
+            this.endHand();
+            return;
         }
         
-        this.players[winner.player].tricks++;
-        
-        // Update tricks display immediately after trick is won
-        this.updateTricksDisplay();
-        
-        const winnerName = this.playerSettings[winner.player].name;
-        this.showMessage(`${winnerName} wins the trick!`);
-        
-        setTimeout(() => {
-            document.getElementById('center-area').innerHTML = '';
-            this.currentTrick = [];
+        // Set next player
+        if (winner?.player) {
+            this.currentPlayer = winner.player;
             
-            if (this.players['south'].cards.length === 0) {
-                this.endHand();
-            } else {
-                this.currentPlayer = winner.player;
-                
-                // Skip partner if playing alone
-                if (this.playingAlone && this.alonePlayer === 'south' && this.currentPlayer === 'north') {
+            // Skip partner if playing alone
+            if (this.playingAlone) {
+                const alonePlayerPartner = this.getPartner(this.alonePlayer);
+                if (this.currentPlayer === alonePlayerPartner) {
                     const players = ['south', 'west', 'north', 'east'];
                     const currentIndex = players.indexOf(this.currentPlayer);
                     this.currentPlayer = players[(currentIndex + 1) % 4];
                 }
-                
-                if (this.players[this.currentPlayer].isAI) {
-                    setTimeout(() => this.aiPlay(), 500);
-                } else {
-                    this.showMessage("Your turn! Click a card to play.");
-                }
             }
-        }, 2000);
+            
+            // Handle AI or player turn
+            if (this.players[this.currentPlayer]?.isAI) {
+                setTimeout(() => this.aiPlay(), 500);
+            } else {
+                // Update display for human player's turn
+                this.displayCards();
+                this.showMessage("Your turn! Click a card to play.");
+            }
+        } else {
+            // Fallback to next player if winner is not properly set
+            this.nextPlayer();
+        }
     }
     
     endHand() {
@@ -813,19 +1088,61 @@ class EuchreGame {
     }
     
     updateScore() {
-        document.getElementById('team1-score').textContent = this.team1Score;
-        document.getElementById('team2-score').textContent = this.team2Score;
-        document.getElementById('round').textContent = this.round;
+        // Safely update score display if elements exist
+        const team1ScoreEl = document.getElementById('team1-score');
+        const team2ScoreEl = document.getElementById('team2-score');
+        const roundEl = document.getElementById('round');
+        const team1TricksEl = document.getElementById('team1-tricks');
+        const team2TricksEl = document.getElementById('team2-tricks');
+        
+        if (team1ScoreEl) team1ScoreEl.textContent = this.team1Score;
+        if (team2ScoreEl) team2ScoreEl.textContent = this.team2Score;
+        if (roundEl) roundEl.textContent = this.round;
+        
+        // Update tricks display
+        if (team1TricksEl) {
+            const team1Tricks = (this.players.south?.tricks || 0) + (this.players.north?.tricks || 0);
+            const oldValue = parseInt(team1TricksEl.textContent);
+            team1TricksEl.textContent = team1Tricks;
+            
+            // Add animation if tricks increased
+            if (team1Tricks > oldValue) {
+                team1TricksEl.parentElement.classList.add('tricks-update');
+                setTimeout(() => {
+                    team1TricksEl.parentElement.classList.remove('tricks-update');
+                }, 400);
+            }
+        }
+        if (team2TricksEl) {
+            const team2Tricks = (this.players.east?.tricks || 0) + (this.players.west?.tricks || 0);
+            const oldValue = parseInt(team2TricksEl.textContent);
+            team2TricksEl.textContent = team2Tricks;
+            
+            // Add animation if tricks increased
+            if (team2Tricks > oldValue) {
+                team2TricksEl.parentElement.classList.add('tricks-update');
+                setTimeout(() => {
+                    team2TricksEl.parentElement.classList.remove('tricks-update');
+                }, 400);
+            }
+        }
     }
     
     updateStats() {
-        document.getElementById('hands-played').textContent = this.stats.handsPlayed;
-        document.getElementById('games-won').textContent = this.stats.gamesWon;
+        // Safely update stats if elements exist
+        const handsPlayedEl = document.getElementById('hands-played');
+        const gamesWonEl = document.getElementById('games-won');
+        const winRateEl = document.getElementById('win-rate');
         
-        const total = this.stats.gamesWon + this.stats.gamesLost;
-        const winRate = total > 0 ? 
-            Math.round((this.stats.gamesWon / total) * 100) : 0;
-        document.getElementById('win-rate').textContent = `${winRate}%`;
+        if (handsPlayedEl) handsPlayedEl.textContent = this.stats.handsPlayed;
+        if (gamesWonEl) gamesWonEl.textContent = this.stats.gamesWon;
+        
+        if (winRateEl) {
+            const total = this.stats.gamesWon + this.stats.gamesLost;
+            const winRate = total > 0 ? 
+                Math.round((this.stats.gamesWon / total) * 100) : 0;
+            winRateEl.textContent = `${winRate}%`;
+        }
     }
     
     showMessage(text) {
@@ -852,14 +1169,6 @@ class EuchreGame {
         };
     }
     
-    updateTricksDisplay() {
-        const team1Tricks = this.players.south.tricks + this.players.north.tricks;
-        const team2Tricks = this.players.east.tricks + this.players.west.tricks;
-        
-        document.getElementById('team1-tricks').textContent = team1Tricks;
-        document.getElementById('team2-tricks').textContent = team2Tricks;
-    }
-    
     displayFlippedCard() {
         const flippedCardEl = document.getElementById('flipped-card');
         const flippedDisplay = document.getElementById('flipped-card-display');
@@ -880,6 +1189,112 @@ class EuchreGame {
     
     hideFlippedCard() {
         document.getElementById('flipped-card-display').classList.remove('active');
+    }
+    
+    displayKitty() {
+        const kittyDisplay = document.getElementById('kitty-display');
+        const kittyCards = document.getElementById('kitty-cards');
+        const kittyCount = document.getElementById('kitty-count');
+        
+        if (!kittyDisplay || !kittyCards || !kittyCount) return;
+        
+        // Show kitty during trump selection phase
+        if (this.trumpSelectionPhase && this.kitty.length > 0) {
+            kittyDisplay.classList.add('active');
+            
+            // Clear previous cards
+            kittyCards.innerHTML = '';
+            
+            // Show face-down cards
+            for (let i = 0; i < this.kitty.length; i++) {
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'kitty-card';
+                kittyCards.appendChild(cardDiv);
+            }
+            
+            kittyCount.textContent = this.kitty.length;
+        } else {
+            kittyDisplay.classList.remove('active');
+        }
+    }
+    
+    hideKitty() {
+        document.getElementById('kitty-display').classList.remove('active');
+    }
+    
+    /**
+     * Convert string to title case
+     * @param {string} str - String to convert
+     * @returns {string} Title case string
+     */
+    toTitleCase(str) {
+        return str.replace(/\w\S*/g, (txt) =>
+            txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+        );
+    }
+    
+    /**
+     * Get a random name and avatar pair for NPC players
+     * @param {string} player - Player position (north, east, west)  
+     * @returns {Object} Object with name and avatar properties
+     */
+    getRandomNPCProfile(player) {
+        const profiles = {
+            north: [
+                { name: 'Alex Thunder', avatar: '⚡' },
+                { name: 'Maya Starlight', avatar: '🌟' },
+                { name: 'Robo Carl', avatar: '🤖' },
+                { name: 'Drama Queen', avatar: '🎭' },
+                { name: 'Lightning Lou', avatar: '⚡' },
+                { name: 'Stellar Sue', avatar: '🌟' },
+                { name: 'Tech Titan', avatar: '🤖' },
+                { name: 'Mystic Mike', avatar: '🎭' }
+            ],
+            east: [
+                { name: 'Bullseye Betty', avatar: '🎯' },
+                { name: 'Fire Fox', avatar: '🔥' },
+                { name: 'Diamond Dan', avatar: '💎' },
+                { name: 'Sharp Shooter', avatar: '🎯' },
+                { name: 'Blaze Master', avatar: '🔥' },
+                { name: 'Gem Hunter', avatar: '💎' },
+                { name: 'Ace Archer', avatar: '🎯' },
+                { name: 'Flame Wizard', avatar: '🔥' }
+            ],
+            west: [
+                { name: 'Rocket Rita', avatar: '🚀' },
+                { name: 'Circus Sam', avatar: '🎪' },
+                { name: 'Lucky Dice', avatar: '🎲' },
+                { name: 'Space Cadet', avatar: '🚀' },
+                { name: 'Ring Master', avatar: '🎪' },
+                { name: 'Game Changer', avatar: '🎲' },
+                { name: 'Cosmic Kate', avatar: '🚀' },
+                { name: 'Carnival King', avatar: '🎪' }
+            ]
+        };
+        
+        const playerProfiles = profiles[player] || profiles.north;
+        const randomProfile = playerProfiles[Math.floor(Math.random() * playerProfiles.length)];
+        
+        // Add position suffix to make names unique
+        const positionNames = {
+            north: '(Partner)',
+            east: '',
+            west: ''
+        };
+        
+        return {
+            name: player === 'north' ? `${randomProfile.name} ${positionNames[player]}` : randomProfile.name,
+            avatar: randomProfile.avatar
+        };
+    }
+    
+    /**
+     * Get a random avatar for NPC players (legacy support)
+     * @param {string} player - Player position (north, east, west)
+     * @returns {string} Random avatar emoji
+     */
+    getRandomAvatar(player) {
+        return this.getRandomNPCProfile(player).avatar;
     }
     
     handleDealerPickup() {
@@ -914,9 +1329,22 @@ class EuchreGame {
         handContainer.innerHTML = '';
         this.players.south.cards.forEach((card, index) => {
             const cardElement = document.createElement('div');
-            cardElement.className = 'card';
-            cardElement.innerHTML = `${card.rank}<br>${card.suit}`;
-            cardElement.style.color = card.color;
+            cardElement.className = 'card dealer-card';
+            cardElement.innerHTML = `
+                <div class="card-content">
+                    <div class="card-corner top-left">
+                        <div class="rank" style="color:${card.color}">${card.rank}</div>
+                        <div class="suit" style="color:${card.color}">${card.suit}</div>
+                    </div>
+                    <div class="card-center" style="color:${card.color}">
+                        ${card.suit}
+                    </div>
+                    <div class="card-corner bottom-right">
+                        <div class="rank rotated" style="color:${card.color}">${card.rank}</div>
+                        <div class="suit rotated" style="color:${card.color}">${card.suit}</div>
+                    </div>
+                </div>
+            `;
             cardElement.onclick = () => this.discardCard(index);
             handContainer.appendChild(cardElement);
         });
@@ -983,39 +1411,7 @@ class EuchreGame {
         document.getElementById(`${player}-preview`).textContent = avatar;
     }
     
-    /**
-     * Select card back style theme with intricate patterns
-     * @param {string} backStyle - The card back theme (classic, red, green, purple, gold)
-     * @param {HTMLElement} optionElement - The clicked option element
-     */
-    selectCardBack(backStyle, optionElement) {
-        // Remove selected class from all card back options
-        document.querySelectorAll('.card-back-option').forEach(opt => {
-            opt.classList.remove('selected');
-        });
-        
-        // Add selected class to clicked option
-        optionElement.classList.add('selected');
-        
-        // Update card back style
-        this.cardBackStyle = backStyle;
-        this.updateCardBacks();
-    }
-    
-    /**
-     * Apply selected card back pattern to all face-down cards
-     * Updates CSS classes for intricate pattern rendering
-     * @returns {void}
-     */
-    updateCardBacks() {
-        // Update all face-down cards with new back style
-        document.querySelectorAll('.card.back').forEach(card => {
-            // Remove existing back style classes
-            card.classList.remove('classic', 'red', 'green', 'purple', 'gold');
-            // Add new back style class
-            card.classList.add(this.cardBackStyle);
-        });
-    }
+    // Card back style is now fixed to classic blue
     
     showSettings() {
         // Load current settings into the form
@@ -1049,28 +1445,12 @@ class EuchreGame {
     }
     
     saveSettings() {
-        // Save name and avatar settings
-        ['south', 'north', 'east', 'west'].forEach(player => {
-            const name = document.getElementById(`${player}-name`).value.trim() || this.playerSettings[player].name;
-            const selectedAvatar = document.querySelector(`#${player}-avatars .avatar-option.selected`);
-            const avatar = selectedAvatar ? selectedAvatar.dataset.avatar : this.playerSettings[player].avatar;
-            
-            this.playerSettings[player] = { name, avatar };
-        });
-        
-        // Update display immediately
-        this.updatePlayerDisplay();
-        
-        // Save to localStorage
+        // Save player settings to localStorage
         try {
             localStorage.setItem('euchre-player-settings', JSON.stringify(this.playerSettings));
-            localStorage.setItem('euchre-card-back', this.cardBackStyle);
         } catch (e) {
             console.error('Error saving settings:', e);
         }
-        
-        this.hideSettings();
-        this.showMessage('Settings saved!');
     }
     
     loadSettings() {
@@ -1078,70 +1458,122 @@ class EuchreGame {
             const saved = localStorage.getItem('euchre-player-settings');
             if (saved) {
                 this.playerSettings = { ...this.playerSettings, ...JSON.parse(saved) };
-            }
-            
-            const savedCardBack = localStorage.getItem('euchre-card-back');
-            if (savedCardBack) {
-                this.cardBackStyle = savedCardBack;
-                this.updateCardBacks();
+            } else {
+                // First time - set random NPC profiles
+                this.initializeRandomNPCs();
             }
         } catch (e) {
             console.error('Error loading settings:', e);
+            // Fallback to random NPCs if loading fails
+            this.initializeRandomNPCs();
         }
+    }
+    
+    /**
+     * Initialize random names and avatars for NPC players
+     * Called on first game load or when settings can't be loaded
+     * Assigns unique character profiles to north, east, and west players
+     */
+    initializeRandomNPCs() {
+        ['north', 'east', 'west'].forEach(player => {
+            const profile = this.getRandomNPCProfile(player);
+            this.playerSettings[player].name = profile.name;
+            this.playerSettings[player].avatar = profile.avatar;
+        });
+        // Save the random settings
+        this.saveSettings();
     }
     
     setDealerChip() {
-        // Remove dealer class from all avatars
-        ['south', 'north', 'east', 'west'].forEach(player => {
-            const avatar = document.getElementById(`${player}-avatar`);
-            if (avatar) {
-                avatar.classList.remove('dealer');
-            }
-        });
+        // Remove existing dealer chips
+        const existingChips = document.querySelectorAll('.dealer-chip');
+        existingChips.forEach(chip => chip.remove());
         
-        // Add dealer class to current dealer
+        // Get the avatar element for the current dealer
         const dealerAvatar = document.getElementById(`${this.currentDealer}-avatar`);
         if (dealerAvatar) {
-            dealerAvatar.classList.add('dealer');
+            const chip = document.createElement('div');
+            chip.className = 'dealer-chip';
+            chip.textContent = 'D';
+            chip.title = 'Dealer';
+            dealerAvatar.appendChild(chip);
         }
     }
     
-    rotateDealerChip() {
-        // Rotate dealer clockwise
-        const dealerOrder = ['south', 'west', 'north', 'east'];
-        const currentIndex = dealerOrder.indexOf(this.currentDealer);
-        this.currentDealer = dealerOrder[(currentIndex + 1) % 4];
+    displayFlippedCard() {
+        const flippedCardEl = document.getElementById('flipped-card');
+        if (!flippedCardEl) return;
         
-        // Update dealer chip display
-        this.setDealerChip();
+        if (this.flippedCard) {
+            flippedCardEl.innerHTML = `
+                <div class="card-content">
+                    <div class="card-corner top-left">
+                        <div class="rank" style="color:${this.flippedCard.color}">${this.flippedCard.rank}</div>
+                        <div class="suit" style="color:${this.flippedCard.color}">${this.flippedCard.suit}</div>
+                    </div>
+                    <div class="card-center" style="color:${this.flippedCard.color}">
+                        ${this.flippedCard.suit}
+                    </div>
+                    <div class="card-corner bottom-right">
+                        <div class="rank rotated" style="color:${this.flippedCard.color}">${this.flippedCard.rank}</div>
+                        <div class="suit rotated" style="color:${this.flippedCard.color}">${this.flippedCard.suit}</div>
+                    </div>
+                </div>
+            `;
+            flippedCardEl.style.display = 'flex';
+        } else {
+            flippedCardEl.style.display = 'none';
+        }
+        
+        // Update trump display
+        const trumpDisplay = document.getElementById('trump-display');
+        if (trumpDisplay) {
+            if (this.trump) {
+                const color = (this.trump === '♥' || this.trump === '♦') ? '#e74c3c' : '#2c3e50';
+                trumpDisplay.innerHTML = `Trump: <span style="color: ${color}">${this.trump}</span>`;
+            } else {
+                trumpDisplay.textContent = 'Trump: Not Set';
+            }
+        }
     }
     
     updatePlayerDisplay() {
+        // Update player avatars and names
         ['south', 'north', 'east', 'west'].forEach(player => {
             const avatar = document.getElementById(`${player}-avatar`);
-            const name = document.querySelector(`.player-position.${this.getPositionClass(player)} .player-name`);
+            const nameEl = document.querySelector(`.player-position.${this.getPositionClass(player)} .player-name`);
             
-            if (avatar) {
+            if (avatar && this.playerSettings[player]) {
                 avatar.textContent = this.playerSettings[player].avatar;
             }
             
-            if (name) {
-                name.textContent = this.playerSettings[player].name;
+            if (nameEl && this.playerSettings[player]) {
+                nameEl.textContent = this.playerSettings[player].name;
             }
         });
         
-        // Update team labels in scoreboard
-        document.getElementById('team1-label').textContent = 
-            `${this.playerSettings.south.name} & ${this.playerSettings.north.name}`;
-        document.getElementById('team2-label').textContent = 
-            `${this.playerSettings.east.name} & ${this.playerSettings.west.name}`;
+        // Update score display with player names
+        const team1Name = `${this.playerSettings.south.name} & ${this.playerSettings.north.name}`;
+        const team2Name = `${this.playerSettings.east.name} & ${this.playerSettings.west.name}`;
+        
+        // Update team name displays in score panel
+        const team1NameElements = document.querySelectorAll('.team-name');
+        if (team1NameElements.length >= 2) {
+            const team1El = team1NameElements[0];
+            const team2El = team1NameElements[1];
             
-        // Update tricks display labels
-        document.getElementById('team1-tricks-label').textContent = 
-            `${this.playerSettings.south.name} & ${this.playerSettings.north.name}:`;
-        document.getElementById('team2-tricks-label').textContent = 
-            `${this.playerSettings.east.name} & ${this.playerSettings.west.name}:`;
-            
+            if (team1El) {
+                const scoreSpan = team1El.querySelector('span');
+                const scoreValue = scoreSpan ? scoreSpan.outerHTML : '';
+                team1El.innerHTML = `${team1Name}: ${scoreValue}`;
+            }
+            if (team2El) {
+                const scoreSpan = team2El.querySelector('span');
+                const scoreValue = scoreSpan ? scoreSpan.outerHTML : '';
+                team2El.innerHTML = `${team2Name}: ${scoreValue}`;
+            }
+        }
+        
         // Update flipped card display
         this.displayFlippedCard();
     }
@@ -1156,13 +1588,217 @@ class EuchreGame {
         return positions[player];
     }
     
+    /**
+     * Get the partner of a given player
+     * @param {string} player - The player position ('south', 'north', 'east', 'west')
+     * @returns {string} The partner's position
+     */
+    getPartner(player) {
+        const partners = {
+            south: 'north',
+            north: 'south',
+            east: 'west',
+            west: 'east'
+        };
+        return partners[player];
+    }
+    
     getRandomDealer() {
         const players = ['south', 'west', 'north', 'east'];
         return players[Math.floor(Math.random() * players.length)];
     }
     
     showHelp() {
-        this.showMessage('Euchre: First team to 10 points wins!');
+        document.getElementById('help-modal').classList.add('active');
+    }
+    
+    hideHelp() {
+        document.getElementById('help-modal').classList.remove('active');
+    }
+    
+    editPlayerName(player) {
+        const nameElement = document.querySelector(`.player-position.${this.getPositionClass(player)} .player-name`);
+        if (!nameElement || nameElement.querySelector('input')) return;
+        
+        const currentName = this.playerSettings[player].name;
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'player-name-input';
+        input.value = currentName;
+        input.maxLength = 12;
+        
+        // Replace text with input
+        nameElement.style.display = 'none';
+        nameElement.parentNode.appendChild(input);
+        input.focus();
+        input.select();
+        
+        let isEditing = true;
+        
+        const saveEdit = () => {
+            if (!isEditing) return;
+            isEditing = false;
+            
+            const newName = this.toTitleCase(input.value.trim()) || currentName;
+            this.playerSettings[player].name = newName;
+            nameElement.textContent = newName;
+            nameElement.style.display = 'block';
+            
+            if (input.parentNode) {
+                input.remove();
+            }
+            
+            this.updatePlayerDisplay();
+            this.saveSettings();
+        };
+        
+        const cancelEdit = () => {
+            if (!isEditing) return;
+            isEditing = false;
+            
+            nameElement.style.display = 'block';
+            if (input.parentNode) {
+                input.remove();
+            }
+        };
+        
+        input.addEventListener('blur', saveEdit);
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                saveEdit();
+            }
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                cancelEdit();
+            }
+        });
+    }
+    
+    showAvatarSelector(player) {
+        // Hide all other selectors
+        document.querySelectorAll('.avatar-selector').forEach(selector => {
+            selector.classList.remove('active');
+        });
+        
+        const selector = document.getElementById(`${player}-avatar-selector`);
+        if (!selector) return;
+        
+        selector.classList.add('active');
+        
+        // Add click handlers for avatar options
+        selector.querySelectorAll('.avatar-option').forEach(option => {
+            option.onclick = (e) => {
+                e.stopPropagation();
+                const avatar = option.dataset.avatar;
+                this.selectPlayerAvatar(player, avatar);
+                selector.classList.remove('active');
+            };
+        });
+        
+        // Close selector when clicking outside
+        setTimeout(() => {
+            const closeHandler = (e) => {
+                if (!selector.contains(e.target)) {
+                    selector.classList.remove('active');
+                    document.removeEventListener('click', closeHandler);
+                }
+            };
+            document.addEventListener('click', closeHandler);
+        }, 100);
+    }
+    
+    selectPlayerAvatar(player, avatar) {
+        this.playerSettings[player].avatar = avatar;
+        document.getElementById(`${player}-avatar`).textContent = avatar;
+        this.updatePlayerDisplay();
+        this.saveSettings();
+    }
+    
+    showNewGameConfirm() {
+        document.getElementById('new-game-modal').classList.add('active');
+    }
+    
+    hideNewGameConfirm() {
+        document.getElementById('new-game-modal').classList.remove('active');
+    }
+    
+    confirmNewGame() {
+        this.hideNewGameConfirm();
+        this.newGame();
+    }
+    
+    /**
+     * Rotate dealer chip to next player
+     */
+    rotateDealerChip() {
+        // Remove dealer chip from current dealer
+        document.querySelectorAll('.dealer-chip').forEach(chip => chip.remove());
+        
+        // Rotate to next dealer
+        const dealers = ['south', 'west', 'north', 'east'];
+        const currentIndex = dealers.indexOf(this.currentDealer);
+        this.currentDealer = dealers[(currentIndex + 1) % 4];
+        
+        // Add dealer chip to new dealer
+        const newDealerAvatar = document.getElementById(`${this.currentDealer}-avatar`);
+        if (newDealerAvatar) {
+            const chip = document.createElement('div');
+            chip.className = 'dealer-chip';
+            chip.textContent = 'D';
+            newDealerAvatar.appendChild(chip);
+        }
+        
+        console.log(`🎰 New dealer: ${this.playerSettings[this.currentDealer]?.name || this.currentDealer}`);
+    }
+    
+    /**
+     * Update the turn indicator to show whose turn it is
+     * @method updateTurnIndicator
+     */
+    updateTurnIndicator() {
+        const indicator = document.getElementById('turn-indicator');
+        const arrow = document.getElementById('turn-arrow');
+        const text = document.getElementById('turn-text');
+        
+        if (!indicator || !arrow || !text) return;
+        
+        // Show indicator during card play phase only
+        if (this.gamePhase === 'play') {
+            indicator.classList.add('active');
+            
+            const playerName = this.playerSettings[this.currentPlayer]?.name || this.currentPlayer;
+            const isYourTurn = this.currentPlayer === 'south';
+            
+            // Update text and direction
+            text.textContent = isYourTurn ? 'Your Turn!' : `${playerName}'s Turn`;
+            
+            // Clear previous direction classes
+            indicator.classList.remove('pointing-north', 'pointing-east', 'pointing-south', 'pointing-west');
+            
+            // Add direction class based on current player
+            const directionMap = {
+                north: 'pointing-north',
+                east: 'pointing-east',
+                south: 'pointing-south',
+                west: 'pointing-west'
+            };
+            
+            indicator.classList.add(directionMap[this.currentPlayer]);
+            
+            // Different styling for your turn
+            if (isYourTurn) {
+                indicator.style.background = 'linear-gradient(135deg, #e74c3c, #c0392b)';
+                indicator.style.boxShadow = '0 4px 15px rgba(231, 76, 60, 0.4)';
+            } else {
+                indicator.style.background = 'linear-gradient(135deg, #27ae60, #2ecc71)';
+                indicator.style.boxShadow = '0 4px 15px rgba(39, 174, 96, 0.3)';
+            }
+            
+            console.log(`🎯 Turn indicator: ${playerName} (${this.currentPlayer})`);
+        } else {
+            indicator.classList.remove('active');
+        }
     }
 }
 

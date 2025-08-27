@@ -7,21 +7,12 @@ const isDev = process.argv.includes('--dev');
 const isWin = process.platform === 'win32';
 
 const store = new Store({
-  name: 'euchre-stats',
+  name: 'euchre-settings',
   defaults: {
-    stats: {
-      totalHands: 0,
-      tricksWon: 0,
-      gamesWon: 0,
-      gamesLost: 0,
-      winStreak: 0,
-      bestWinStreak: 0
-    },
     settings: {
       difficulty: 'medium',
       soundEnabled: true,
-      animationSpeed: 'normal',
-      cardBack: 'classic'
+      animationSpeed: 'normal'
     }
   }
 });
@@ -196,46 +187,9 @@ function updateDifficulty(level) {
   mainWindow.webContents.send('difficulty-changed', level);
 }
 
-function showStats() {
-  const stats = store.get('stats');
-  const statsMessage = `
-Total Hands: ${stats.totalHands}
-Tricks Won: ${stats.tricksWon}
-Games Won: ${stats.gamesWon}
-Games Lost: ${stats.gamesLost}
-Current Win Streak: ${stats.winStreak}
-Best Win Streak: ${stats.bestWinStreak}
-Win Rate: ${stats.gamesWon + stats.gamesLost > 0 ? 
-  ((stats.gamesWon / (stats.gamesWon + stats.gamesLost)) * 100).toFixed(1) : 0}%
-  `;
-  
-  dialog.showMessageBox(mainWindow, {
-    type: 'info',
-    title: 'Game Statistics',
-    message: 'Your Euchre Statistics',
-    detail: statsMessage,
-    buttons: ['OK', 'Reset Stats']
-  }).then((response) => {
-    if (response.response === 1) {
-      store.set('stats', {
-        totalHands: 0,
-        tricksWon: 0,
-        gamesWon: 0,
-        gamesLost: 0,
-        winStreak: 0,
-        bestWinStreak: 0
-      });
-      mainWindow.webContents.send('stats-reset');
-    }
-  });
-}
+// Stats functionality has been removed
 
 // IPC handlers
-ipcMain.handle('get-stats', () => store.get('stats'));
-ipcMain.handle('save-stats', (event, stats) => {
-  store.set('stats', stats);
-  return true;
-});
 ipcMain.handle('get-settings', () => store.get('settings'));
 ipcMain.handle('save-settings', (event, settings) => {
   store.set('settings', settings);

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Euchre Game</title>
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
     <div class="loading" id="loading">
@@ -12,76 +13,115 @@
     </div>
     
     <div class="game-container">
-        <div class="sidebar">
-            <div class="score-board">
-                <h3>Score</h3>
-                <div class="score-row">
-                    <span id="team1-label">Team 1 (You & North)</span>
-                    <span class="stat-value" id="team1-score">0</span>
-                </div>
-                <div class="score-row">
-                    <span id="team2-label">Team 2 (East & West)</span>
-                    <span class="stat-value" id="team2-score">0</span>
-                </div>
-                <div class="score-row">
-                    <span>Round</span>
-                    <span class="stat-value" id="round">1</span>
-                </div>
-            </div>
-            
-            <div class="controls">
-                <button class="btn" onclick="game.newGame()">New Game</button>
-                <button class="btn btn-secondary" onclick="game.showSettings()">Settings</button>
-                <button class="btn btn-secondary" onclick="game.showHelp()">How to Play</button>
-            </div>
-            
-            <div class="stats-panel">
-                <h3>Session Stats</h3>
-                <div class="stat-row">
-                    <span>Hands Played</span>
-                    <span class="stat-value" id="hands-played">0</span>
-                </div>
-                <div class="stat-row">
-                    <span>Games Won</span>
-                    <span class="stat-value" id="games-won">0</span>
-                </div>
-                <div class="stat-row">
-                    <span>Win Rate</span>
-                    <span class="stat-value" id="win-rate">0%</span>
-                </div>
-                <div class="stat-row">
-                    <span>Difficulty</span>
-                    <span class="stat-value" id="difficulty">Medium</span>
-                </div>
-            </div>
-        </div>
         
         <div class="main-game">
             <div class="game-table">
+                <div class="game-controls">
+                    <div class="control-buttons">
+                        <button class="new-game-btn" onclick="game.showNewGameConfirm()">
+                            New Game
+                        </button>
+                        <button class="icon-btn" title="How to Play" onclick="game.showHelp()">
+                            <i class="fas fa-question-circle"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="score-display">
+                    <div class="scores-container">
+                        <div class="team-group">
+                            <div class="team">
+                                <div class="team-name">You & North: <span id="team1-score">0</span></div>
+                                <div class="tricks">Tricks: <span id="team1-tricks">0</span>/5</div>
+                            </div>
+                        </div>
+                        <div class="vertical-divider"></div>
+                        <div class="team-group">
+                            <div class="team">
+                                <div class="team-name">East & West: <span id="team2-score">0</span></div>
+                                <div class="tricks">Tricks: <span id="team2-tricks">0</span>/5</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </div>
                 <div class="trump-display" id="trump-display">Trump: Not Set</div>
+                
+                <div class="turn-indicator" id="turn-indicator">
+                    <div class="turn-arrow" id="turn-arrow"></div>
+                    <div class="turn-text" id="turn-text">Your Turn</div>
+                </div>
                 
                 <div class="player-position top">
                     <div class="player-cards" id="north-cards"></div>
-                    <div class="player-avatar" id="north-avatar">🤖</div>
-                    <div class="player-name">North (Partner)</div>
+                    <div class="player-avatar-container">
+                        <div class="player-avatar" id="north-avatar" onclick="game.showAvatarSelector('north')">🤖</div>
+                        <div class="avatar-selector" id="north-avatar-selector">
+                            <div class="avatar-option" data-avatar="🤖">🤖</div>
+                            <div class="avatar-option" data-avatar="👨">👨</div>
+                            <div class="avatar-option" data-avatar="👩">👩</div>
+                            <div class="avatar-option" data-avatar="🧑">🧑</div>
+                            <div class="avatar-option" data-avatar="👤">👤</div>
+                            <div class="avatar-option" data-avatar="🎭">🎭</div>
+                            <div class="avatar-option" data-avatar="⚡">⚡</div>
+                            <div class="avatar-option" data-avatar="🌟">🌟</div>
+                        </div>
+                    </div>
+                    <div class="player-name editable" onclick="game.editPlayerName('north')">North (Partner)</div>
                 </div>
                 
                 <div class="player-position left">
                     <div class="player-cards" id="west-cards"></div>
-                    <div class="player-avatar" id="west-avatar">🤖</div>
-                    <div class="player-name">West</div>
+                    <div class="player-avatar-container">
+                        <div class="player-avatar" id="west-avatar" onclick="game.showAvatarSelector('west')">🤖</div>
+                        <div class="avatar-selector" id="west-avatar-selector">
+                            <div class="avatar-option" data-avatar="🤖">🤖</div>
+                            <div class="avatar-option" data-avatar="👨">👨</div>
+                            <div class="avatar-option" data-avatar="👩">👩</div>
+                            <div class="avatar-option" data-avatar="🧑">🧑</div>
+                            <div class="avatar-option" data-avatar="👤">👤</div>
+                            <div class="avatar-option" data-avatar="🚀">🚀</div>
+                            <div class="avatar-option" data-avatar="🎪">🎪</div>
+                            <div class="avatar-option" data-avatar="🎲">🎲</div>
+                        </div>
+                    </div>
+                    <div class="player-name editable" onclick="game.editPlayerName('west')">West</div>
                 </div>
                 
                 <div class="player-position right">
                     <div class="player-cards" id="east-cards"></div>
-                    <div class="player-avatar" id="east-avatar">🤖</div>
-                    <div class="player-name">East</div>
+                    <div class="player-avatar-container">
+                        <div class="player-avatar" id="east-avatar" onclick="game.showAvatarSelector('east')">🤖</div>
+                        <div class="avatar-selector" id="east-avatar-selector">
+                            <div class="avatar-option" data-avatar="🤖">🤖</div>
+                            <div class="avatar-option" data-avatar="👨">👨</div>
+                            <div class="avatar-option" data-avatar="👩">👩</div>
+                            <div class="avatar-option" data-avatar="🧑">🧑</div>
+                            <div class="avatar-option" data-avatar="👤">👤</div>
+                            <div class="avatar-option" data-avatar="🎯">🎯</div>
+                            <div class="avatar-option" data-avatar="🔥">🔥</div>
+                            <div class="avatar-option" data-avatar="💎">💎</div>
+                        </div>
+                    </div>
+                    <div class="player-name editable" onclick="game.editPlayerName('east')">East</div>
                 </div>
                 
                 <div class="player-position bottom">
                     <div class="player-cards" id="south-cards"></div>
-                    <div class="player-avatar" id="south-avatar">😊</div>
-                    <div class="player-name">You</div>
+                    <div class="player-avatar-container">
+                        <div class="player-avatar" id="south-avatar" onclick="game.showAvatarSelector('south')">😊</div>
+                        <div class="avatar-selector" id="south-avatar-selector">
+                            <div class="avatar-option" data-avatar="😊">😊</div>
+                            <div class="avatar-option" data-avatar="😎">😎</div>
+                            <div class="avatar-option" data-avatar="🤓">🤓</div>
+                            <div class="avatar-option" data-avatar="😄">😄</div>
+                            <div class="avatar-option" data-avatar="🙂">🙂</div>
+                            <div class="avatar-option" data-avatar="😋">😋</div>
+                            <div class="avatar-option" data-avatar="🤔">🤔</div>
+                            <div class="avatar-option" data-avatar="😏">😏</div>
+                        </div>
+                    </div>
+                    <div class="player-name editable" onclick="game.editPlayerName('south')">You</div>
                 </div>
                 
                 <div class="center-area" id="center-area"></div>
@@ -107,17 +147,6 @@
                     </div>
                 </div>
                 
-                <div class="tricks-display" id="tricks-display">
-                    <h4>Tricks Won</h4>
-                    <div class="trick-row">
-                        <span id="team1-tricks-label">Team 1:</span>
-                        <span id="team1-tricks">0</span>
-                    </div>
-                    <div class="trick-row">
-                        <span id="team2-tricks-label">Team 2:</span>
-                        <span id="team2-tricks">0</span>
-                    </div>
-                </div>
                 
                 <div class="flipped-card-display" id="flipped-card-display">
                     <h4>Flipped Card</h4>
@@ -126,9 +155,92 @@
                     </div>
                 </div>
                 
+                <div class="kitty-display" id="kitty-display">
+                    <h4>Kitty</h4>
+                    <div class="kitty-container">
+                        <div class="kitty-cards" id="kitty-cards"></div>
+                        <div class="kitty-count"><span id="kitty-count">3</span> cards</div>
+                    </div>
+                </div>
+                
                 <div class="dealer-discard" id="dealer-discard">
                     <h3>Dealer: Pick up and discard</h3>
                     <div class="dealer-hand" id="dealer-hand"></div>
+                </div>
+                
+                <div class="new-game-modal" id="new-game-modal">
+                    <div class="modal-content">
+                        <h3>Start New Game?</h3>
+                        <p>This will end the current game and start fresh. Your progress will be lost.</p>
+                        <div class="modal-buttons">
+                            <button class="confirm-btn" onclick="game.confirmNewGame()">Start New Game</button>
+                            <button class="cancel-btn" onclick="game.hideNewGameConfirm()">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="help-modal" id="help-modal">
+                    <div class="help-content">
+                        <div class="help-header">
+                            <h2>🃏 How to Play Euchre</h2>
+                            <button class="close-btn" onclick="game.hideHelp()">&times;</button>
+                        </div>
+                        <div class="help-body">
+                            <div class="help-section">
+                                <h3>🎯 Game Objective</h3>
+                                <p>Be the first team to score <strong>10 points</strong> by winning tricks with trump cards!</p>
+                            </div>
+                            
+                            <div class="help-section">
+                                <h3>🃎 Card Hierarchy</h3>
+                                <p><strong>Trump Suit (Highest to Lowest):</strong></p>
+                                <ul>
+                                    <li>Right Bower (Jack of trump suit)</li>
+                                    <li>Left Bower (Jack of same color as trump)</li>
+                                    <li>Ace, King, Queen, 10, 9 of trump</li>
+                                </ul>
+                                <p><strong>Non-Trump:</strong> A, K, Q, J, 10, 9</p>
+                            </div>
+                            
+                            <div class="help-section">
+                                <h3>🎲 Game Flow</h3>
+                                <ol>
+                                    <li><strong>Deal:</strong> 5 cards each, flip one for trump</li>
+                                    <li><strong>Trump Selection:</strong> Players can "order up" or pass</li>
+                                    <li><strong>Play Tricks:</strong> Follow suit if possible, highest trump wins</li>
+                                    <li><strong>Score:</strong> Team that called trump needs 3+ tricks to score</li>
+                                </ol>
+                            </div>
+                            
+                            <div class="help-section">
+                                <h3>📊 Scoring</h3>
+                                <ul>
+                                    <li><strong>Make it:</strong> 3-4 tricks = 1 point</li>
+                                    <li><strong>March:</strong> All 5 tricks = 2 points</li>
+                                    <li><strong>Euchred:</strong> Opponents get 2 points if you fail</li>
+                                    <li><strong>Alone March:</strong> All 5 tricks alone = 4 points</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="help-section">
+                                <h3>🚀 Going Alone</h3>
+                                <p>If you're confident, declare "alone" and play without your partner for bonus points!</p>
+                            </div>
+                            
+                            <div class="help-section">
+                                <h3>💡 Tips</h3>
+                                <ul>
+                                    <li>Remember: Left bower becomes part of trump suit</li>
+                                    <li>Count trump cards to track what's still out</li>
+                                    <li>Communication with partner is key</li>
+                                    <li>Don't order up trump without strong cards</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="help-footer">
+                            <p><strong>Reference:</strong> <a href="https://bicyclecards.com/how-to-play/euchre/" target="_blank" rel="noopener">Complete Euchre Rules</a></p>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="settings-panel" id="settings-panel">
@@ -136,7 +248,11 @@
                     
                     <div class="player-customization">
                         <h4><span id="south-preview">😊</span> Your Player</h4>
-                        <input type="text" class="name-input" id="south-name" placeholder="Enter your name" value="You">
+                        <div class="name-input-container">
+                            <input type="text" class="name-input" id="south-name" placeholder="Enter your name" value="You" maxlength="12">
+                            <span class="char-count">0/12</span>
+                        </div>
+                        <div class="name-feedback" id="south-feedback"></div>
                         <div class="avatar-options" id="south-avatars">
                             <div class="avatar-option selected" data-avatar="😊">😊</div>
                             <div class="avatar-option" data-avatar="😎">😎</div>
@@ -151,7 +267,11 @@
                     
                     <div class="player-customization">
                         <h4><span id="north-preview">🤖</span> North Player (Partner)</h4>
-                        <input type="text" class="name-input" id="north-name" placeholder="Enter partner name" value="North (Partner)">
+                        <div class="name-input-container">
+                            <input type="text" class="name-input" id="north-name" placeholder="Enter partner name" value="North" maxlength="12">
+                            <span class="char-count">0/12</span>
+                        </div>
+                        <div class="name-feedback" id="north-feedback"></div>
                         <div class="avatar-options" id="north-avatars">
                             <div class="avatar-option selected" data-avatar="🤖">🤖</div>
                             <div class="avatar-option" data-avatar="👨">👨</div>
@@ -166,7 +286,11 @@
                     
                     <div class="player-customization">
                         <h4><span id="east-preview">🤖</span> East Player</h4>
-                        <input type="text" class="name-input" id="east-name" placeholder="Enter east player name" value="East">
+                        <div class="name-input-container">
+                            <input type="text" class="name-input" id="east-name" placeholder="Enter east player name" value="East" maxlength="12">
+                            <span class="char-count">0/12</span>
+                        </div>
+                        <div class="name-feedback" id="east-feedback"></div>
                         <div class="avatar-options" id="east-avatars">
                             <div class="avatar-option selected" data-avatar="🤖">🤖</div>
                             <div class="avatar-option" data-avatar="👨">👨</div>
@@ -181,7 +305,11 @@
                     
                     <div class="player-customization">
                         <h4><span id="west-preview">🤖</span> West Player</h4>
-                        <input type="text" class="name-input" id="west-name" placeholder="Enter west player name" value="West">
+                        <div class="name-input-container">
+                            <input type="text" class="name-input" id="west-name" placeholder="Enter west player name" value="West" maxlength="12">
+                            <span class="char-count">0/12</span>
+                        </div>
+                        <div class="name-feedback" id="west-feedback"></div>
                         <div class="avatar-options" id="west-avatars">
                             <div class="avatar-option selected" data-avatar="🤖">🤖</div>
                             <div class="avatar-option" data-avatar="👨">👨</div>
@@ -191,17 +319,6 @@
                             <div class="avatar-option" data-avatar="🚀">🚀</div>
                             <div class="avatar-option" data-avatar="🎪">🎪</div>
                             <div class="avatar-option" data-avatar="🎲">🎲</div>
-                        </div>
-                    </div>
-                    
-                    <div class="card-back-customization">
-                        <h4>Card Back Style</h4>
-                        <div class="card-back-options" id="card-back-options">
-                            <div class="card-back-option selected" data-back="classic" style="background: linear-gradient(135deg, #1e3c72, #2a5298); color: white;">Classic Blue</div>
-                            <div class="card-back-option" data-back="red" style="background: linear-gradient(135deg, #8b0000, #dc143c); color: white;">Royal Red</div>
-                            <div class="card-back-option" data-back="green" style="background: linear-gradient(135deg, #0f4c3a, #16a085); color: white;">Forest Green</div>
-                            <div class="card-back-option" data-back="purple" style="background: linear-gradient(135deg, #4a154b, #8e44ad); color: white;">Royal Purple</div>
-                            <div class="card-back-option" data-back="gold" style="background: linear-gradient(135deg, #b8860b, #ffd700); color: #333;">Golden Elegance</div>
                         </div>
                     </div>
                     

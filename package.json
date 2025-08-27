@@ -10,6 +10,11 @@
     "web": "node server.js",
     "dev": "concurrently \"npm run server\" \"electron . --dev\"",
     "dev-web": "node server.js --dev",
+    "test": "node tests/euchre.test.js",
+    "test:watch": "nodemon tests/euchre.test.js",
+    "lint": "jshint public/js/euchre.js || true",
+    "lint:fix": "jshint public/js/euchre.js --fix || true",
+    "validate": "npm run lint && npm run test",
     "build-win": "electron-builder --win --x64",
     "build-win32": "electron-builder --win --ia32",
     "build-mac": "electron-builder --mac",
@@ -32,7 +37,9 @@
     "concurrently": "^9.2.1",
     "electron": "^37.3.1",
     "electron-builder": "^26.0.12",
-    "husky": "^9.0.0"
+    "husky": "^9.0.0",
+    "jshint": "^2.13.6",
+    "nodemon": "^3.0.2"
   },
   "dependencies": {
     "compression": "^1.7.4",

@@ -13,24 +13,26 @@ body {
     justify-content: center;
     align-items: center;
     user-select: none;
-    min-width: 320px; /* Ensure minimum readable width */
-    overflow-x: auto;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
 }
 
 .game-container {
-    width: 100%;
-    max-width: 1400px;
-    min-width: 800px; /* Minimum game area width */
-    display: flex;
+    width: 100vw;
     height: 100vh;
-    min-height: 600px; /* Minimum game area height */
+    max-width: 1400px;
+    max-height: 900px;
+    display: flex;
     background: #1a3f2e;
     color: white;
-    overflow: hidden;
     justify-content: center;
     align-items: center;
-    padding: 20px;
-    transform-origin: center center;
+    padding: clamp(5px, 2vw, 20px);
+    position: relative;
+    
+    /* Fluid scaling based on viewport */
+    font-size: clamp(12px, 1.5vw, 16px);
 }
 
 .main-game {
@@ -2304,30 +2306,227 @@ body {
     }
 }
 
-/* Auto-scaling for very small screens */
-@media (max-width: 320px), (max-height: 568px) {
-    .game-container {
-        transform: scale(0.85);
-        transform-origin: center center;
-        min-width: 280px;
-        min-height: 400px;
+/* CSS Custom Properties for fluid scaling */
+:root {
+    --game-scale: clamp(0.6, min(100vw / 900, 100vh / 650), 1.1);
+    --card-width: clamp(30px, 7vw, 60px);
+    --card-height: clamp(42px, 10vw, 85px);
+    --avatar-size: clamp(35px, 9vw, 80px);
+    --font-size-small: clamp(9px, 2vw, 13px);
+    --font-size-normal: clamp(11px, 2.5vw, 15px);
+    --font-size-large: clamp(13px, 3vw, 18px);
+    --spacing-small: clamp(3px, 1vw, 8px);
+    --spacing-medium: clamp(6px, 1.5vw, 15px);
+    --spacing-large: clamp(10px, 2.5vw, 20px);
+}
+
+.main-game {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    
+    /* Apply fluid scaling */
+    transform: scale(var(--game-scale));
+    transform-origin: center center;
+}
+
+/* Responsive cards */
+.card {
+    width: var(--card-width) !important;
+    height: var(--card-height) !important;
+    font-size: var(--font-size-small) !important;
+}
+
+/* Responsive avatars */
+.player-avatar {
+    width: var(--avatar-size) !important;
+    height: var(--avatar-size) !important;
+    font-size: calc(var(--avatar-size) * 0.4) !important;
+}
+
+/* Responsive text sizes */
+.player-name {
+    font-size: var(--font-size-small) !important;
+    padding: var(--spacing-small) var(--spacing-medium) !important;
+}
+
+.team-name {
+    font-size: var(--font-size-normal) !important;
+}
+
+.trump-display {
+    font-size: var(--font-size-normal) !important;
+    padding: var(--spacing-small) !important;
+}
+
+/* Mobile portrait optimization */
+@media (orientation: portrait) and (max-width: 768px) {
+    :root {
+        --game-scale: clamp(0.5, min(100vw / 900, 100vh / 800), 0.9);
     }
     
-    body {
-        min-width: 280px;
+    .game-container {
+        padding: var(--spacing-small);
     }
 }
 
-/* Force horizontal scrolling on extremely narrow screens */
-@media (max-width: 280px) {
-    body {
-        overflow-x: scroll;
-        min-width: 320px;
+/* Mobile landscape optimization */
+@media (orientation: landscape) and (max-height: 500px) {
+    :root {
+        --game-scale: clamp(0.4, min(100vw / 1200, 100vh / 600), 0.8);
     }
     
     .game-container {
-        min-width: 800px;
-        transform: scale(0.35);
-        margin: 0 auto;
+        padding: var(--spacing-small);
+    }
+}
+
+/* Extra small screens (phones) */
+@media (max-width: 480px) {
+    :root {
+        --game-scale: clamp(0.4, min(100vw / 800, 100vh / 700), 0.7);
+        --card-width: clamp(25px, 6vw, 40px);
+        --card-height: clamp(35px, 8.5vw, 56px);
+        --avatar-size: clamp(30px, 8vw, 60px);
+    }
+}
+
+/* Touch-friendly interactions */
+@media (pointer: coarse) {
+    /* Larger touch targets for mobile */
+    .card {
+        cursor: pointer;
+        transition: transform 0.1s ease;
+    }
+    
+    .card:hover {
+        transform: scale(1.05);
+    }
+    
+    .card:active {
+        transform: scale(0.95);
+    }
+    
+    .btn, button {
+        min-height: 44px; /* iOS recommended touch target size */
+        min-width: 44px;
+        padding: var(--spacing-medium) var(--spacing-large);
+        font-size: var(--font-size-normal);
+        touch-action: manipulation; /* Prevent double-tap zoom */
+    }
+    
+    .trump-option {
+        min-height: 50px;
+        min-width: 50px;
+        padding: var(--spacing-medium);
+        touch-action: manipulation;
+    }
+    
+    .control-buttons button {
+        margin: var(--spacing-small);
+        padding: var(--spacing-medium);
+    }
+    
+    /* Larger clickable areas for mobile */
+    .player-avatar {
+        touch-action: manipulation;
+    }
+    
+    /* Improve dialog touch interactions */
+    .trump-selection, .dealer-discard {
+        padding: var(--spacing-large);
+    }
+    
+    .trump-selection h3, .dealer-discard h3 {
+        font-size: var(--font-size-large);
+        margin-bottom: var(--spacing-medium);
+    }
+}
+
+/* Prevent text selection on touch devices */
+@media (pointer: coarse) {
+    * {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* Allow text selection in specific areas if needed */
+    input, textarea {
+        -webkit-user-select: text;
+        user-select: text;
+    }
+}
+
+/* Ultra-responsive adjustments for very narrow screens */
+@media (max-width: 360px) {
+    :root {
+        --game-scale: clamp(0.35, min(100vw / 700, 100vh / 600), 0.6);
+        --card-width: clamp(22px, 5.5vw, 35px);
+        --card-height: clamp(31px, 7.7vw, 49px);
+        --avatar-size: clamp(28px, 7vw, 50px);
+        --font-size-small: clamp(8px, 1.8vw, 11px);
+        --font-size-normal: clamp(10px, 2.2vw, 13px);
+    }
+    
+    .game-container {
+        padding: 2px;
+    }
+    
+    /* Stack elements more compactly on very small screens */
+    .scores-container {
+        flex-direction: column;
+        gap: var(--spacing-small);
+    }
+    
+    .control-buttons {
+        gap: var(--spacing-small);
+    }
+    
+    .control-buttons button {
+        padding: var(--spacing-small);
+        font-size: var(--font-size-small);
+    }
+}
+
+/* Landscape phone optimizations */
+@media (max-height: 450px) and (orientation: landscape) {
+    :root {
+        --game-scale: clamp(0.3, min(100vw / 1100, 100vh / 500), 0.65);
+    }
+    
+    .game-container {
+        padding: 2px;
+        max-height: 100vh;
+        overflow: hidden;
+    }
+    
+    .main-game {
+        height: 100vh;
+    }
+    
+    /* Compress vertical spacing in landscape */
+    .score-display, .game-controls {
+        padding: var(--spacing-small);
+    }
+    
+    .trump-display {
+        padding: 2px var(--spacing-small);
+        font-size: var(--font-size-small);
+    }
+}
+
+/* High DPI screen optimizations */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 2dppx) {
+    .card {
+        border-width: 0.5px; /* Thinner borders on high DPI screens */
+    }
+    
+    .player-avatar {
+        border-width: 1px;
     }
 }

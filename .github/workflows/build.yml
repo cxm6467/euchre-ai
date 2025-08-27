@@ -18,7 +18,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-latest, macos-14]
         include:
           - os: ubuntu-latest
             platform: linux
@@ -30,7 +30,7 @@ jobs:
             build_cmd: build-win
             artifact_pattern: "dist/*.exe"
             artifact_name: "windows-installer"
-          - os: macos-latest
+          - os: macos-14
             platform: macos
             build_cmd: build-mac
             artifact_pattern: "dist/*.dmg"
@@ -208,7 +208,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-ios:
-    runs-on: macos-latest
+    runs-on: macos-14
     # Always run this job, but conditionally upload to release
     if: github.event_name == 'push'
     
@@ -235,7 +235,7 @@ jobs:
       - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '15.2'
+          xcode-version: 'latest-stable'
 
       - name: Setup CocoaPods
         run: sudo gem install cocoapods

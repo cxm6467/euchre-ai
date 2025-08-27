@@ -135,7 +135,14 @@
                     <div class="player-name editable" id="south-name" onclick="game.editPlayerName('south')" role="status" aria-live="polite" aria-current="false" aria-label="Current player indicator">You</div>
                 </div>
                 
-                <div class="center-area" id="center-area"></div>
+                <div class="center-area" id="center-area">
+                    <div class="deal-button-container" id="deal-button-container">
+                        <button class="deal-btn" id="deal-btn" onclick="game.dealCards()">
+                            <span class="deal-icon">🃏</span>
+                            <span class="deal-text">Deal Cards</span>
+                        </button>
+                    </div>
+                </div>
                 <div class="message" id="message"></div>
                 
                 <div class="trump-selection" id="trump-selection">

@@ -160,6 +160,9 @@ class EuchreGame {
     }
     
     dealCards() {
+        // Hide deal button when dealing starts
+        this.hideDealButton();
+        
         this.createDeck();
         
         // Clear previous cards and reset tricks
@@ -424,7 +427,7 @@ class EuchreGame {
             } else {
                 // Everyone passed second round - redeal (shouldn't happen with stick the dealer)
                 this.showMessage('Everyone passed - redealing...');
-                setTimeout(() => this.dealCards(), 2000);
+                setTimeout(() => this.showDealButton(), 2000);
             }
         } else if (this.trumpSelectionRound === 2 && this.passedPlayers.length === 3) {
             // Stick the dealer - dealer must choose trump
@@ -1066,7 +1069,7 @@ class EuchreGame {
             document.getElementById('north-avatar').classList.remove('sitting-out');
             
             this.rotateDealerChip();
-            setTimeout(() => this.dealCards(), 3000);
+            setTimeout(() => this.showDealButton(), 3000);
         }
     }
     
@@ -1112,7 +1115,18 @@ class EuchreGame {
         this.hideTrumpSelection();
         this.setDealerChip();
         this.updateScore();
-        this.dealCards();
+        
+        // Clear all cards from display
+        ['north', 'east', 'south', 'west'].forEach(pos => {
+            document.getElementById(`${pos}-cards`).innerHTML = '';
+            this.players[pos].cards = [];
+        });
+        
+        // Reset trump display
+        document.getElementById('trump-display').innerHTML = 'Trump: Not Set';
+        
+        // Show deal button instead of auto-dealing
+        this.showDealButton();
     }
     
     updateScore() {
@@ -1813,6 +1827,39 @@ class EuchreGame {
             soundBtn.textContent = this.soundEnabled ? '🔊' : '🔇';
         }
         this.saveSettings();
+    }
+    
+    /**
+     * Show the deal button in center area
+     * @method showDealButton
+     */
+    showDealButton() {
+        const dealContainer = document.getElementById('deal-button-container');
+        if (dealContainer) {
+            dealContainer.classList.remove('hidden');
+            dealContainer.style.display = 'flex';
+        }
+        
+        // Clear any trick cards from center area
+        const centerArea = document.getElementById('center-area');
+        if (centerArea) {
+            const trickCards = centerArea.querySelectorAll('.trick-card');
+            trickCards.forEach(card => card.remove());
+        }
+        
+        this.showMessage('Ready to play! Click "Deal Cards" to start the hand.');
+    }
+    
+    /**
+     * Hide the deal button
+     * @method hideDealButton  
+     */
+    hideDealButton() {
+        const dealContainer = document.getElementById('deal-button-container');
+        if (dealContainer) {
+            dealContainer.classList.add('hidden');
+            dealContainer.style.display = 'none';
+        }
     }
 
 

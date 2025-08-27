@@ -169,8 +169,9 @@ type(scope): description
 
 ### Technologies Used
 - **Frontend**: HTML5, CSS3, JavaScript (ES6+)
-- **Desktop**: Electron
+- **Desktop**: Electron with Vercel Analytics integration
 - **Server**: Express.js (for web version)
+- **Analytics**: Vercel Analytics for usage tracking
 - **Build**: electron-builder
 - **Linting**: commitlint with conventional commits
 

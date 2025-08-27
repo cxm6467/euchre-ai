@@ -1,6 +1,12 @@
 const { app, BrowserWindow, Menu, dialog, ipcMain, shell } = require('electron');
 const path = require('path');
 const Store = require('electron-store');
+const { inject } = require('@vercel/analytics');
+
+/**
+ * Euchre Game - Main Electron Process
+ * Handles window management, menu creation, and analytics integration
+ */
 
 // Configuration
 const isDev = process.argv.includes('--dev');
@@ -20,7 +26,10 @@ const store = new Store({
 let mainWindow;
 let serverProcess;
 
-// Start local server in production
+/**
+ * Start local Express server for production builds
+ * @function startLocalServer
+ */
 function startLocalServer() {
   if (!isDev) {
     const { spawn } = require('child_process');
@@ -37,6 +46,10 @@ function startLocalServer() {
   }
 }
 
+/**
+ * Create the main application window with Vercel Analytics integration
+ * @function createWindow
+ */
 function createWindow() {
   // Create the browser window
   mainWindow = new BrowserWindow({
@@ -66,6 +79,9 @@ function createWindow() {
   // Show window when ready
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
+    
+    // Inject Vercel Analytics
+    inject();
   });
 
   // Create application menu
@@ -79,6 +95,10 @@ function createWindow() {
   });
 }
 
+/**
+ * Create application menu with game controls and settings
+ * @function createMenu
+ */
 function createMenu() {
   const template = [
     {
@@ -182,6 +202,11 @@ function createMenu() {
   Menu.setApplicationMenu(menu);
 }
 
+/**
+ * Update game difficulty setting
+ * @function updateDifficulty
+ * @param {string} level - Difficulty level (easy, medium, hard, expert)
+ */
 function updateDifficulty(level) {
   store.set('settings.difficulty', level);
   mainWindow.webContents.send('difficulty-changed', level);

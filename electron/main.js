@@ -17,7 +17,6 @@ const store = new Store({
   defaults: {
     settings: {
       difficulty: 'medium',
-      soundEnabled: true,
       animationSpeed: 'normal'
     }
   }
@@ -212,7 +211,6 @@ ipcMain.handle('save-settings', (event, settings) => {
 
 // App event handlers
 app.whenReady().then(() => {
-  startLocalServer();
   createWindow();
 });
 

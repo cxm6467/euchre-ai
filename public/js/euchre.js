@@ -1907,22 +1907,30 @@ class EuchreGame {
     }
     
     /**
-     * Update turn indicator to show whose turn it is with small arrows by avatars
+     * Update turn indicator to show whose turn it is with dual arrows by avatars
      * @method updateTurnIndicator
      */
     updateTurnIndicator() {
         // Hide all turn arrows first
-        const allArrows = ['north-turn', 'east-turn', 'south-turn', 'west-turn'];
+        const allArrows = [
+            'north-turn-left', 'north-turn-right',
+            'east-turn-left', 'east-turn-right', 
+            'south-turn-left', 'south-turn-right',
+            'west-turn-left', 'west-turn-right'
+        ];
         allArrows.forEach(arrowId => {
             const arrow = document.getElementById(arrowId);
             if (arrow) arrow.classList.remove('active');
         });
         
-        // Show arrow for current player during card play phase
+        // Show arrows for current player during card play phase
         if (this.gamePhase === 'play' && this.currentPlayer) {
-            const currentArrow = document.getElementById(`${this.currentPlayer}-turn`);
-            if (currentArrow) {
-                currentArrow.classList.add('active');
+            const leftArrow = document.getElementById(`${this.currentPlayer}-turn-left`);
+            const rightArrow = document.getElementById(`${this.currentPlayer}-turn-right`);
+            
+            if (leftArrow && rightArrow) {
+                leftArrow.classList.add('active');
+                rightArrow.classList.add('active');
                 
                 const playerName = this.playerSettings[this.currentPlayer]?.name || this.currentPlayer;
                 console.log(`🎯 Turn indicator: ${playerName} (${this.currentPlayer})`);

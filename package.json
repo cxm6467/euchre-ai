@@ -139,11 +139,6 @@
       "category": "Game",
       "synopsis": "Cross-platform Euchre card game with AI opponents",
       "description": "A classic Euchre card game featuring intelligent AI opponents, customizable game settings, and cross-platform compatibility."
-    },
-    "publish": {
-      "provider": "github",
-      "owner": "cxm6467",
-      "repo": "euchre-game"
     }
   }
 }

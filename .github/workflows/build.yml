@@ -146,7 +146,21 @@ jobs:
 
       - name: Create Android keystore
         run: |
-          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android-keystore.jks || keytool -genkey -v -keystore android-keystore.jks -alias euchre-key -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Euchre Game, OU=Game Dev, O=Euchre, L=City, S=State, C=US"
+          if [ ! -z "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" ]; then
+            echo "Using provided keystore from secrets"
+            echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android-keystore.jks
+          else
+            echo "Generating new keystore for unsigned release"
+            keytool -genkey -v -keystore android-keystore.jks -alias euchre-key -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Euchre Game, OU=Game Dev, O=Euchre, L=City, S=State, C=US"
+          fi
+          
+          # Verify keystore was created
+          if [ ! -f android-keystore.jks ]; then
+            echo "Error: Keystore file was not created"
+            exit 1
+          fi
+          
+          ls -la android-keystore.jks
 
       - name: Build Android APK
         run: |

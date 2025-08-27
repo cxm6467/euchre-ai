@@ -30,15 +30,16 @@ A cross-platform Euchre card game built with Electron and web technologies, feat
   - Forest Green (swirling gradient)
   - Royal Purple (radiating segments)
   - Golden Elegance (striped metallic)
-- **Sound Effects**: Synthesized audio with mute toggle
-- **Statistics Tracking**: Win/loss records and game metrics
+- **Enhanced Victory Screen**: Professional win/loss display with detailed game statistics
+- **Statistics Tracking**: Win/loss records, win rate percentage, and comprehensive game metrics
 - **Mobile Responsive**: Touch-optimized for all screen sizes
 
 ### Cross-Platform Support
 - **Desktop Apps**: Native Windows (.exe), macOS (.dmg), and Linux (.AppImage)
+- **Android APK**: Native Android app with Capacitor framework
 - **Web Version**: Runs in any modern browser with Express.js backend
 - **Electron Integration**: Desktop features with Vercel Analytics
-- **PWA Support**: Installable as Progressive Web App on mobile
+- **PWA Support**: Installable as Progressive Web App on mobile devices
 
 ## 📦 Downloads
 
@@ -47,16 +48,22 @@ Download pre-built applications from the [GitHub Releases page](https://github.c
 - **Windows**: Download the `.exe` installer
 - **macOS**: Download the `.dmg` file
 - **Linux**: Download the `.AppImage` file
+- **Android**: Download the `.apk` file
 
 ### Installation Instructions:
 - **Windows**: Run the installer and follow the setup wizard
 - **macOS**: Open the DMG and drag the app to Applications
 - **Linux**: Make the AppImage executable: `chmod +x *.AppImage && ./Euchre-*.AppImage`
+- **Android**: Enable "Install from unknown sources" in Settings → Security, then install the APK
 
 ## 🚀 Development Setup
 
 ### Prerequisites
 - Node.js 16+ and npm
+- For Android development:
+  - Java 21+ (JDK)
+  - Android Studio with Android SDK
+  - Android SDK Build-Tools
 
 ### Installation
 ```bash
@@ -74,6 +81,18 @@ npm start
 ```bash
 npm run server
 # Open http://localhost:8080
+```
+
+### Android Development
+```bash
+# Sync web assets to Android
+npm run cap:sync
+
+# Open in Android Studio
+npx cap open android
+
+# Build APK directly
+npm run cap:build
 ```
 
 ### Development Mode
@@ -100,6 +119,11 @@ npm run build-mac      # Universal binary (x64 + ARM64)
 npm run build-linux    # Portable AppImage
 ```
 
+### Android APK
+```bash
+npm run cap:build      # Build release APK
+```
+
 ## 🧪 Testing
 
 ### Run Tests
@@ -119,14 +143,20 @@ npm run lint       # Code quality checks
 ```
 euchre-game/
 ├── .github/workflows/        # CI/CD pipeline
-│   └── build.yml            # Automated builds and releases
+│   └── build.yml            # Automated multi-platform builds
 ├── public/                  # Web application
-│   ├── css/styles.css      # Responsive UI with card themes
-│   ├── js/euchre.js        # Core game engine (1000+ lines)
+│   ├── css/
+│   │   ├── styles.css      # Desktop-optimized UI
+│   │   └── mobile.css      # Mobile-first responsive design
+│   ├── js/euchre.js        # Core game engine (2000+ lines)
+│   ├── manifest.json       # PWA configuration
 │   └── index.html          # Mobile-optimized interface
 ├── electron/               # Desktop application
 │   ├── main.js            # Main process with window management
 │   └── preload.js         # Secure renderer communication
+├── android/                # Android application (Capacitor)
+│   ├── app/               # Android app source
+│   └── gradle files      # Build configuration
 ├── assets/                # Application resources
 │   ├── icon.ico/.icns/.png # Platform-specific icons
 │   └── entitlements.mac.plist # macOS signing configuration
@@ -137,6 +167,22 @@ euchre-game/
 ├── package.json          # Dependencies and build configuration
 └── game-stats.json       # Persistent statistics storage
 ```
+
+## 🆕 Recent Updates
+
+### v0.1.4 - Mobile & Android Support
+- **🤖 Android APK Generation**: Native Android app with automated CI/CD builds
+- **📱 Mobile-First Design**: Responsive UI optimized for touch devices  
+- **🏆 Enhanced Victory Screen**: Professional win/loss display with detailed statistics
+- **🔇 Audio System Removed**: Streamlined experience without sound effects
+- **⚡ Performance Improvements**: Optimized card interactions and animations
+- **🃏 Deal Button Control**: Manual game start instead of auto-dealing
+
+### Previous Updates
+- **v0.1.3**: Card dealing animations and improved mobile scaling
+- **v0.1.2**: Trump selection overlays and enhanced visual feedback
+- **v0.1.1**: Cross-platform builds with CI/CD automation  
+- **v0.1.0**: Initial release with complete Euchre implementation
 
 ## 🎯 Game Rules & Scoring
 

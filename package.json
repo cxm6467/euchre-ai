@@ -24,7 +24,10 @@
     "dist": "electron-builder",
     "postinstall": "electron-builder install-app-deps",
     "prepare": "husky install",
-    "lint:commit": "commitlint --edit"
+    "lint:commit": "commitlint --edit",
+    "cap:sync": "npx cap sync",
+    "cap:build": "npm run cap:sync && cd android && ./gradlew assembleRelease",
+    "cap:serve": "npx cap serve"
   },
   "keywords": [
     "euchre",
@@ -39,6 +42,7 @@
   "devDependencies": {
     "@commitlint/cli": "^19.0.0",
     "@commitlint/config-conventional": "^19.0.0",
+    "astral-regex": "^2.0.0",
     "concurrently": "^9.2.1",
     "cross-env": "^10.0.0",
     "electron": "^37.3.1",
@@ -49,6 +53,9 @@
     "wait-on": "^8.0.4"
   },
   "dependencies": {
+    "@capacitor/android": "^7.4.3",
+    "@capacitor/cli": "^7.4.3",
+    "@capacitor/core": "^7.4.3",
     "@vercel/analytics": "^1.5.0",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
@@ -100,7 +107,9 @@
       "installerHeaderIcon": "assets/icon.ico",
       "deleteAppDataOnUninstall": false,
       "displayLanguageSelector": false,
-      "installerLanguages": ["en_US"],
+      "installerLanguages": [
+        "en_US"
+      ],
       "language": "1033",
       "guid": "a4fc8c68-5456-4b8f-a9a3-2e8f9b7c1d6e"
     },

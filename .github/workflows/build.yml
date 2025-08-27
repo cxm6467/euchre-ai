@@ -104,3 +104,75 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-android:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: []
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Create Android keystore
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android-keystore.jks || keytool -genkey -v -keystore android-keystore.jks -alias euchre-key -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Euchre Game, OU=Game Dev, O=Euchre, L=City, S=State, C=US"
+
+      - name: Build Android APK
+        run: |
+          npx cap sync android
+          cd android
+          ./gradlew assembleRelease -Pandroid.injected.signing.store.file=../android-keystore.jks -Pandroid.injected.signing.store.password=android -Pandroid.injected.signing.key.alias=euchre-key -Pandroid.injected.signing.key.password=android
+
+      - name: Upload Android APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: android/app/build/outputs/apk/release/app-release.apk
+
+      - name: Upload APK to Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: android/app/build/outputs/apk/release/app-release.apk
+          name: Release ${{ github.ref_name }}
+          body: |
+            ## 🎮 Euchre Game ${{ github.ref_name }}
+            
+            Download the appropriate installer for your platform:
+            
+            - **Windows**: Download the `.exe` file
+            - **macOS**: Download the `.dmg` file  
+            - **Linux**: Download the `.AppImage` file
+            - **Android**: Download the `.apk` file
+            
+            ### Installation Instructions:
+            - **Windows**: Run the installer and follow the setup wizard
+            - **macOS**: Open the DMG and drag the app to Applications
+            - **Linux**: Make the AppImage executable and run: `chmod +x *.AppImage && ./Euchre-*.AppImage`
+            - **Android**: Enable "Install from unknown sources" and install the APK
+            
+            ### What's New:
+            See the commit history for detailed changes in this release.
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

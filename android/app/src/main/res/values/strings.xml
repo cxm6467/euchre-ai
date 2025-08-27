@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Euchre Game</string>
+    <string name="title_activity_main">Euchre Game</string>
+    <string name="package_name">com.euchre.game</string>
+    <string name="custom_url_scheme">com.euchre.game</string>
+</resources>

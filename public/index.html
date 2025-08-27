@@ -36,6 +36,14 @@
                             <div class="team">
                                 <div class="team-name">You & North: <span id="team1-score">0</span></div>
                                 <div class="tricks">Tricks: <span id="team1-tricks">0</span>/5</div>
+                                <div class="supplemental-score" id="team1-supplemental">
+                                    <div class="score-cards">
+                                        <div class="score-card-container">
+                                            <div class="score-card red" id="team1-card-2">2♥</div>
+                                            <div class="score-card black" id="team1-card-3">3♠</div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="vertical-divider"></div>
@@ -43,6 +51,14 @@
                             <div class="team">
                                 <div class="team-name">East & West: <span id="team2-score">0</span></div>
                                 <div class="tricks">Tricks: <span id="team2-tricks">0</span>/5</div>
+                                <div class="supplemental-score" id="team2-supplemental">
+                                    <div class="score-cards">
+                                        <div class="score-card-container">
+                                            <div class="score-card red" id="team2-card-2">2♦</div>
+                                            <div class="score-card black" id="team2-card-3">3♣</div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -74,9 +90,9 @@
                 <div class="player-position left">
                     <div class="player-cards" id="west-cards"></div>
                     <div class="player-avatar-container">
-                        <div class="turn-arrow-small left-arrow" id="west-turn-left">▼</div>
+                        <div class="turn-arrow-small left-arrow" id="west-turn-left">▶</div>
                         <div class="player-avatar" id="west-avatar" onclick="game.showAvatarSelector('west')">🤖</div>
-                        <div class="turn-arrow-small right-arrow" id="west-turn-right">▲</div>
+                        <div class="turn-arrow-small right-arrow" id="west-turn-right">◀</div>
                         <div class="avatar-selector" id="west-avatar-selector">
                             <div class="avatar-option" data-avatar="🤖">🤖</div>
                             <div class="avatar-option" data-avatar="👨">👨</div>
@@ -94,9 +110,9 @@
                 <div class="player-position right">
                     <div class="player-cards" id="east-cards"></div>
                     <div class="player-avatar-container">
-                        <div class="turn-arrow-small left-arrow" id="east-turn-left">▲</div>
+                        <div class="turn-arrow-small left-arrow" id="east-turn-left">◀</div>
                         <div class="player-avatar" id="east-avatar" onclick="game.showAvatarSelector('east')">🤖</div>
-                        <div class="turn-arrow-small right-arrow" id="east-turn-right">▼</div>
+                        <div class="turn-arrow-small right-arrow" id="east-turn-right">▶</div>
                         <div class="avatar-selector" id="east-avatar-selector">
                             <div class="avatar-option" data-avatar="🤖">🤖</div>
                             <div class="avatar-option" data-avatar="👨">👨</div>

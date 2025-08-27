@@ -1,0 +1,84 @@
+{
+  "name": "euchre-game",
+  "version": "1.0.0",
+  "description": "Cross-platform Euchre card game with AI opponents",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "start-win": "electron.cmd .",
+    "server": "node server.js",
+    "web": "node server.js",
+    "dev": "concurrently \"npm run server\" \"electron . --dev\"",
+    "dev-web": "node server.js --dev",
+    "build-win": "electron-builder --win --x64",
+    "build-win32": "electron-builder --win --ia32",
+    "build-mac": "electron-builder --mac",
+    "build-linux": "electron-builder --linux",
+    "dist": "electron-builder",
+    "postinstall": "electron-builder install-app-deps",
+    "prepare": "husky install",
+    "lint:commit": "commitlint --edit"
+  },
+  "keywords": [
+    "euchre",
+    "card game",
+    "electron"
+  ],
+  "author": "Euchre Game Developer",
+  "license": "MIT",
+  "devDependencies": {
+    "@commitlint/cli": "^19.0.0",
+    "@commitlint/config-conventional": "^19.0.0",
+    "concurrently": "^9.2.1",
+    "electron": "^37.3.1",
+    "electron-builder": "^26.0.12",
+    "husky": "^9.0.0"
+  },
+  "dependencies": {
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "electron-store": "^10.1.0",
+    "express": "^5.1.0"
+  },
+  "build": {
+    "appId": "com.euchregame.app",
+    "productName": "Euchre",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "allowElevation": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "mac": {
+      "category": "public.app-category.games",
+      "icon": "assets/icon.icns"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "assets/icon.png",
+      "category": "Game"
+    }
+  }
+}

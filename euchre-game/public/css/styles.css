@@ -1,0 +1,1023 @@
+/* Euchre Game Styles */
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+}
+
+.game-container {
+    width: 100%;
+    max-width: 1400px;
+    height: 100vh;
+    display: flex;
+    padding: 20px;
+    gap: 20px;
+    overflow: hidden;
+}
+
+.sidebar {
+    width: 320px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.main-game {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.game-table {
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse at center, #2a5f3e, #1a3f2e);
+    border-radius: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    box-shadow: inset 0 5px 20px rgba(0,0,0,0.5);
+}
+
+/* Player Positioning */
+.player-position {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.player-position.top {
+    flex-direction: column-reverse;
+}
+
+.player-position.left {
+    flex-direction: row;
+    align-items: center;
+}
+
+.player-position.right {
+    flex-direction: row-reverse;
+    align-items: center;
+}
+
+.player-position.bottom { bottom: 30px; }
+.player-position.top { top: 80px; }
+.player-position.left { left: 30px; top: 50%; transform: translateY(-50%); }
+.player-position.right { right: 30px; top: 50%; transform: translateY(-50%); }
+
+.player-position.left .player-cards {
+    flex-direction: column;
+    gap: -10px;
+}
+
+.player-position.right .player-cards {
+    flex-direction: column;
+    gap: -10px;
+}
+
+.player-position.left .card,
+.player-position.right .card {
+    width: 50px;
+    height: 70px;
+    font-size: 18px;
+}
+
+/* Player Avatars */
+.player-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    color: white;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    transition: transform 0.3s;
+}
+
+.player-avatar.sitting-out {
+    opacity: 0.4;
+    filter: grayscale(80%);
+    transform: scale(0.9);
+}
+
+.player-avatar.sitting-out::before {
+    content: '💤';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    font-size: 24px;
+    z-index: 10;
+}
+
+.player-avatar.dealer {
+    border: 4px solid gold;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.6), 0 4px 15px rgba(0,0,0,0.3);
+    position: relative;
+}
+
+.player-avatar.dealer::after {
+    content: '🏆';
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: linear-gradient(135deg, #ffd700, #ffed4a);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    border: 2px solid white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.player-name {
+    background: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-weight: 600;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+/* Cards */
+.player-cards {
+    display: flex;
+    gap: -20px;
+    transition: all 0.3s;
+}
+
+.card {
+    width: 70px;
+    height: 100px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    cursor: pointer;
+    transition: transform 0.2s;
+    position: relative;
+}
+
+.card:hover { 
+    transform: translateY(-15px);
+    z-index: 10;
+}
+
+.card.back {
+    background: linear-gradient(45deg, #1a237e 25%, #3949ab 25%, #3949ab 50%, #1a237e 50%, #1a237e 75%, #3949ab 75%);
+    background-size: 20px 20px;
+}
+
+.card.back.classic {
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+}
+
+.card.back.red {
+    background: linear-gradient(135deg, #8b0000, #dc143c);
+}
+
+.card.back.green {
+    background: linear-gradient(135deg, #0f4c3a, #16a085);
+}
+
+.card.back.purple {
+    background: linear-gradient(135deg, #4a154b, #8e44ad);
+}
+
+.card.back.gold {
+    background: linear-gradient(135deg, #b8860b, #ffd700);
+}
+
+/* Center Area and Trick Cards */
+.center-area {
+    width: 300px;
+    height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    margin-top: 30px;
+}
+
+.trick-card {
+    width: 80px;
+    height: 110px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    position: absolute;
+    transition: all 0.5s;
+}
+
+/* Position cards closer to players */
+.trick-card.player-west { transform: translate(-120px, -10px) rotate(-3deg); }
+.trick-card.player-north { transform: translate(-10px, -100px) rotate(2deg); }
+.trick-card.player-east { transform: translate(120px, -10px) rotate(1deg); }
+.trick-card.player-south { transform: translate(-10px, 90px) rotate(-1deg); }
+
+/* Trump Display */
+.trump-display {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    padding: 12px 35px;
+    border-radius: 25px;
+    font-size: 22px;
+    font-weight: bold;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    z-index: 50;
+    border: 3px solid #667eea;
+}
+
+/* Scoreboard */
+.score-board {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.score-board h3 {
+    margin-bottom: 15px;
+    font-size: 20px;
+}
+
+.score-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+
+/* Buttons */
+.btn {
+    width: 100%;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.btn:hover { transform: scale(1.02); }
+.btn:active { transform: scale(0.98); }
+
+.btn-secondary {
+    background: #6c757d;
+}
+
+.controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Stats Panel */
+.stats-panel {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 15px;
+}
+
+.stats-panel h3 {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    color: #666;
+}
+
+.stat-value {
+    font-weight: bold;
+    color: #333;
+}
+
+/* Messages */
+.message {
+    position: absolute;
+    bottom: 200px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.85);
+    color: white;
+    padding: 15px 40px;
+    border-radius: 10px;
+    font-size: 18px;
+    display: none;
+    z-index: 100;
+    cursor: pointer;
+    transition: opacity 0.3s;
+}
+
+.message:hover {
+    opacity: 0.8;
+}
+
+.message.active { 
+    display: block;
+    animation: slideIn 0.3s;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translate(-50%, 20px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* Trump Selection Dialog */
+.trump-selection {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    z-index: 200;
+    display: none;
+    text-align: center;
+}
+
+.trump-selection.active {
+    display: block;
+    animation: slideIn 0.3s;
+}
+
+.trump-selection h3 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.trump-options {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.trump-option {
+    width: 80px;
+    height: 80px;
+    border: 3px solid #ddd;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: white;
+}
+
+.trump-option:hover {
+    border-color: #667eea;
+    transform: scale(1.1);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.pass-btn {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+}
+
+.pass-btn:hover {
+    background: #5a6268;
+}
+
+.alone-option {
+    margin-top: 15px;
+    text-align: center;
+}
+
+.alone-btn {
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.alone-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
+/* Tricks Display */
+.tricks-display {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 15px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    min-width: 120px;
+}
+
+.tricks-display h4 {
+    margin-bottom: 10px;
+    color: #333;
+    font-size: 16px;
+}
+
+.trick-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    color: #666;
+    font-size: 14px;
+}
+
+/* Flipped Card Display */
+.flipped-card-display {
+    position: absolute;
+    bottom: 140px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 15px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    display: none;
+}
+
+.flipped-card-display.active {
+    display: block;
+}
+
+.flipped-card-display h4 {
+    margin-bottom: 10px;
+    color: #333;
+    font-size: 16px;
+    text-align: center;
+}
+
+.flipped-card-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.flipped-card {
+    width: 70px;
+    height: 100px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    border: 3px solid #667eea;
+    position: relative;
+}
+
+
+/* Dealer discard selection */
+.dealer-discard {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    z-index: 200;
+    display: none;
+    text-align: center;
+}
+
+.dealer-discard.active {
+    display: block;
+    animation: slideIn 0.3s;
+}
+
+.dealer-discard h3 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.dealer-hand {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.dealer-card {
+    width: 60px;
+    height: 85px;
+    background: white;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 2px solid #ddd;
+}
+
+.dealer-card:hover {
+    transform: translateY(-5px);
+    border-color: #e74c3c;
+}
+
+.dealer-card.pickup {
+    border-color: #667eea;
+    background: #f0f4ff;
+}
+
+/* Settings Panel */
+.settings-panel {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    z-index: 200;
+    display: none;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.settings-panel.active {
+    display: block;
+    animation: slideIn 0.3s;
+}
+
+.settings-panel h3 {
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+}
+
+.player-customization {
+    margin-bottom: 25px;
+    padding: 15px;
+    border: 2px solid #f0f0f0;
+    border-radius: 10px;
+}
+
+.player-customization h4 {
+    margin-bottom: 15px;
+    color: #555;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.name-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.name-input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.avatar-options {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.avatar-option {
+    width: 50px;
+    height: 50px;
+    border: 3px solid #ddd;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: white;
+}
+
+.avatar-option:hover {
+    border-color: #667eea;
+    transform: scale(1.1);
+}
+
+.avatar-option.selected {
+    border-color: #667eea;
+    background: #f0f4ff;
+    transform: scale(1.1);
+}
+
+/* Card Back Selection */
+.card-back-customization {
+    margin-bottom: 25px;
+}
+
+.card-back-customization h4 {
+    margin-bottom: 15px;
+    color: #555;
+}
+
+.card-back-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+}
+
+.card-back-option {
+    padding: 12px 8px;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-back-option:hover {
+    transform: scale(1.05);
+    border-color: #667eea;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.card-back-option.selected {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+    transform: scale(1.05);
+}
+
+.settings-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.settings-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.settings-btn.primary {
+    background: #667eea;
+    color: white;
+}
+
+.settings-btn.primary:hover {
+    background: #5a67d8;
+}
+
+.settings-btn.secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.settings-btn.secondary:hover {
+    background: #5a6268;
+}
+
+/* Loading screen */
+.loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    color: white;
+    font-size: 24px;
+}
+
+.loading.hidden {
+    display: none;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 1200px) {
+    .game-container {
+        flex-direction: column;
+        height: auto;
+        min-height: 100vh;
+        padding: 10px;
+        gap: 15px;
+    }
+    
+    .sidebar {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 15px;
+        gap: 15px;
+    }
+    
+    .score-board {
+        flex: 1;
+        min-width: 200px;
+    }
+    
+    .controls {
+        flex: 1;
+        min-width: 200px;
+    }
+    
+    .stats-panel {
+        flex: 1;
+        min-width: 200px;
+    }
+}
+
+@media (max-width: 768px) {
+    .game-container {
+        padding: 5px;
+        gap: 10px;
+    }
+    
+    .sidebar {
+        flex-direction: column;
+        padding: 10px;
+        gap: 10px;
+    }
+    
+    .main-game {
+        padding: 10px;
+        min-height: 500px;
+    }
+    
+    .game-table {
+        border-radius: 15px;
+    }
+    
+    /* Adjust player positions for mobile */
+    .player-position.top { top: 50px; }
+    .player-position.bottom { bottom: 15px; }
+    .player-position.left { left: 15px; }
+    .player-position.right { right: 15px; }
+    
+    .player-avatar {
+        width: 60px;
+        height: 60px;
+        font-size: 28px;
+    }
+    
+    .player-name {
+        font-size: 12px;
+        padding: 3px 10px;
+    }
+    
+    /* Smaller cards for mobile */
+    .card {
+        width: 50px;
+        height: 70px;
+        font-size: 18px;
+    }
+    
+    .player-position.left .card,
+    .player-position.right .card {
+        width: 35px;
+        height: 50px;
+        font-size: 14px;
+    }
+    
+    .trick-card {
+        width: 60px;
+        height: 85px;
+        font-size: 20px;
+    }
+    
+    /* Adjust trick card positions for mobile */
+    .trick-card.player-west { transform: translate(-80px, -5px) rotate(-3deg); }
+    .trick-card.player-north { transform: translate(-5px, -70px) rotate(2deg); }
+    .trick-card.player-east { transform: translate(80px, -5px) rotate(1deg); }
+    .trick-card.player-south { transform: translate(-5px, 65px) rotate(-1deg); }
+    
+    .trump-display {
+        font-size: 16px;
+        padding: 8px 20px;
+        top: 5px;
+    }
+    
+    /* Mobile-friendly dialogs */
+    .trump-selection,
+    .settings-panel {
+        width: 95%;
+        max-width: none;
+        padding: 20px;
+        max-height: 90vh;
+    }
+    
+    .trump-option {
+        width: 60px;
+        height: 60px;
+        font-size: 28px;
+    }
+    
+    /* Adjust side displays for mobile */
+    .tricks-display {
+        position: fixed;
+        bottom: 10px;
+        left: 10px;
+        right: auto;
+        font-size: 12px;
+        padding: 10px;
+        min-width: auto;
+        z-index: 10;
+    }
+    
+    .flipped-card-display {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        right: auto;
+        bottom: auto;
+        font-size: 12px;
+        padding: 10px;
+        z-index: 10;
+    }
+    
+    .flipped-card {
+        width: 50px;
+        height: 70px;
+        font-size: 16px;
+    }
+    
+    .dealer-discard {
+        width: 95%;
+        padding: 20px;
+    }
+    
+    .dealer-card {
+        width: 45px;
+        height: 65px;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .game-container {
+        padding: 2px;
+    }
+    
+    .sidebar {
+        padding: 8px;
+    }
+    
+    .main-game {
+        padding: 5px;
+    }
+    
+    .player-avatar {
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+    }
+    
+    .player-name {
+        font-size: 11px;
+        padding: 2px 8px;
+    }
+    
+    .card {
+        width: 40px;
+        height: 56px;
+        font-size: 14px;
+    }
+    
+    .player-position.left .card,
+    .player-position.right .card {
+        width: 30px;
+        height: 42px;
+        font-size: 12px;
+    }
+    
+    .trick-card {
+        width: 50px;
+        height: 70px;
+        font-size: 16px;
+    }
+    
+    .trump-display {
+        font-size: 14px;
+        padding: 6px 15px;
+        position: fixed;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 100;
+    }
+    
+    .trump-option {
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+    }
+    
+    .btn {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+    
+    .message {
+        font-size: 14px;
+        padding: 10px 20px;
+    }
+}
+
+/* Touch-friendly improvements */
+@media (pointer: coarse) {
+    .card {
+        cursor: default;
+    }
+    
+    .card:hover {
+        transform: translateY(-10px);
+    }
+    
+    .trump-option:hover {
+        transform: scale(1.05);
+    }
+    
+    .btn:hover {
+        transform: none;
+    }
+    
+    .btn:active {
+        transform: scale(0.95);
+    }
+}

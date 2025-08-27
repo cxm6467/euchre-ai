@@ -7,7 +7,12 @@ A cross-platform Euchre card game built with Electron and web technologies, feat
 - **Authentic Euchre Rules**: Complete implementation including trump selection, going alone, stick the dealer
 - **Smart AI Opponents**: Multiple difficulty levels with intelligent card play
 - **Player Customization**: Custom names and avatar selection with emoji options
-- **Card Back Themes**: 5 beautiful card back designs (Classic Blue, Royal Red, Forest Green, Royal Purple, Golden Elegance)
+- **Card Back Themes**: 5 stunning card back designs with intricate patterns
+  - **Classic Blue**: Diamond lattice pattern with sparkling accents
+  - **Royal Red**: Sophisticated crosshatch weave design
+  - **Forest Green**: Mesmerizing swirling conic gradient
+  - **Royal Purple**: Radiating segments with diagonal overlays
+  - **Golden Elegance**: Luxury striped pattern with metallic highlights
 - **Dealer Pickup/Discard**: Proper Euchre mechanic where dealer picks up flipped card and discards
 - **Statistics Tracking**: Win/loss records and performance metrics
 - **Random Dealer**: Any player can start as dealer, not just the user

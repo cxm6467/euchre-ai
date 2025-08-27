@@ -1,5 +1,17 @@
-// Euchre Game Implementation
+/**
+ * Euchre Game Implementation
+ * A complete implementation of the classic 4-player card game Euchre
+ * with AI opponents, authentic rules, and mobile-responsive design.
+ * 
+ * @class EuchreGame
+ * @author Euchre AI Development Team
+ * @version 1.0.0
+ */
 class EuchreGame {
+    /**
+     * Initialize a new Euchre game with default settings
+     * @constructor
+     */
     constructor() {
         this.deck = [];
         this.players = {
@@ -372,6 +384,10 @@ class EuchreGame {
         document.getElementById('trump-selection').classList.remove('active');
     }
     
+    /**
+     * Select trump suit and handle dealer pickup mechanics
+     * @param {string} suit - The trump suit (♠, ♥, ♦, ♣)
+     */
     selectTrump(suit) {
         this.trump = suit;
         
@@ -953,6 +969,11 @@ class EuchreGame {
         document.getElementById(`${player}-preview`).textContent = avatar;
     }
     
+    /**
+     * Select card back style theme with intricate patterns
+     * @param {string} backStyle - The card back theme (classic, red, green, purple, gold)
+     * @param {HTMLElement} optionElement - The clicked option element
+     */
     selectCardBack(backStyle, optionElement) {
         // Remove selected class from all card back options
         document.querySelectorAll('.card-back-option').forEach(opt => {

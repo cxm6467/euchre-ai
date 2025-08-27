@@ -195,23 +195,66 @@ body {
 }
 
 .card.back.classic {
-    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    background: 
+        radial-gradient(circle at 25% 25%, rgba(255,255,255,0.2) 2px, transparent 2px),
+        radial-gradient(circle at 75% 75%, rgba(255,255,255,0.15) 1px, transparent 1px),
+        linear-gradient(45deg, #1e3c72 25%, transparent 25%),
+        linear-gradient(-45deg, #2a5298 25%, transparent 25%),
+        linear-gradient(135deg, #1e3c72, #2a5298);
+    background-size: 20px 20px, 15px 15px, 10px 10px, 10px 10px, 100% 100%;
 }
 
 .card.back.red {
-    background: linear-gradient(135deg, #8b0000, #dc143c);
+    background: 
+        repeating-linear-gradient(45deg, 
+            rgba(255,255,255,0.1) 0px, 
+            rgba(255,255,255,0.1) 2px, 
+            transparent 2px, 
+            transparent 8px),
+        repeating-linear-gradient(-45deg, 
+            rgba(0,0,0,0.1) 0px, 
+            rgba(0,0,0,0.1) 1px, 
+            transparent 1px, 
+            transparent 6px),
+        radial-gradient(circle at center, #dc143c, #8b0000);
+    background-size: 16px 16px, 12px 12px, 100% 100%;
 }
 
 .card.back.green {
-    background: linear-gradient(135deg, #0f4c3a, #16a085);
+    background: 
+        conic-gradient(from 0deg at 50% 50%, 
+            #0f4c3a 0deg, #16a085 60deg, #0f4c3a 120deg, #16a085 180deg, 
+            #0f4c3a 240deg, #16a085 300deg, #0f4c3a 360deg),
+        radial-gradient(circle at 30% 70%, rgba(255,255,255,0.2) 3px, transparent 3px),
+        radial-gradient(circle at 70% 30%, rgba(0,0,0,0.1) 2px, transparent 2px);
+    background-size: 40px 40px, 25px 25px, 20px 20px;
 }
 
 .card.back.purple {
-    background: linear-gradient(135deg, #4a154b, #8e44ad);
+    background: 
+        repeating-conic-gradient(from 0deg at 50% 50%, 
+            #4a154b 0deg 30deg, 
+            #8e44ad 30deg 60deg, 
+            #4a154b 60deg 90deg, 
+            #8e44ad 90deg 120deg),
+        linear-gradient(45deg, rgba(255,255,255,0.1) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(0,0,0,0.1) 25%, transparent 25%),
+        radial-gradient(ellipse at center, #8e44ad, #4a154b);
+    background-size: 30px 30px, 8px 8px, 8px 8px, 100% 100%;
 }
 
 .card.back.gold {
-    background: linear-gradient(135deg, #b8860b, #ffd700);
+    background: 
+        repeating-linear-gradient(0deg, 
+            #ffd700 0px, #ffd700 2px, 
+            #b8860b 2px, #b8860b 4px),
+        repeating-linear-gradient(90deg, 
+            rgba(255,255,255,0.3) 0px, rgba(255,255,255,0.3) 1px, 
+            transparent 1px, transparent 3px),
+        radial-gradient(circle at 25% 75%, rgba(0,0,0,0.1) 2px, transparent 2px),
+        radial-gradient(circle at 75% 25%, rgba(255,255,255,0.2) 3px, transparent 3px),
+        linear-gradient(135deg, #b8860b, #ffd700, #daa520);
+    background-size: 12px 12px, 6px 6px, 20px 20px, 25px 25px, 100% 100%;
 }
 
 /* Center Area and Trick Cards */
@@ -336,16 +379,16 @@ body {
 /* Messages */
 .message {
     position: absolute;
-    bottom: 200px;
+    top: 40%;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate(-50%, -50%);
     background: rgba(0,0,0,0.85);
     color: white;
     padding: 15px 40px;
     border-radius: 10px;
     font-size: 18px;
     display: none;
-    z-index: 100;
+    z-index: 150;
     cursor: pointer;
     transition: opacity 0.3s;
 }

@@ -1185,7 +1185,10 @@ class EuchreGame {
     showMessage(text) {
         const msg = document.getElementById('message');
         msg.textContent = text;
-        msg.className = 'message active';
+        
+        // Add red background for "not your turn" messages
+        const isNotYourTurn = text.includes("not your turn") || text.includes("It's not your turn");
+        msg.className = isNotYourTurn ? 'message active not-your-turn' : 'message active';
         
         // Clear any existing timeout
         if (this.messageTimeout) {
@@ -1266,7 +1269,7 @@ class EuchreGame {
      */
     toTitleCase(str) {
         return str.replace(/\w\S*/g, (txt) =>
-            txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+            txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase()
         );
     }
     
@@ -1907,15 +1910,28 @@ class EuchreGame {
      * @method updateTurnIndicator
      */
     updateTurnIndicator() {
-        // Remove glow from all player names first
+        // Remove glow from all player names and sitting out indicators first
         const allPlayers = ['north', 'east', 'south', 'west'];
         allPlayers.forEach(player => {
             const nameElement = document.getElementById(`${player}-name`);
+            const playerPosition = nameElement?.closest('.player-position');
             if (nameElement) {
                 nameElement.classList.remove('active-turn');
                 nameElement.setAttribute('aria-current', 'false');
             }
+            if (playerPosition) {
+                playerPosition.classList.remove('sitting-out');
+            }
         });
+        
+        // If someone is playing alone, mark their partner as sitting out
+        if (this.playingAlone && this.alonePlayer) {
+            const partnerPlayer = this.getPartner(this.alonePlayer);
+            const partnerPosition = document.querySelector(`.player-position.${partnerPlayer}`);
+            if (partnerPosition) {
+                partnerPosition.classList.add('sitting-out');
+            }
+        }
         
         // Add glow to current player's name during card play phase
         if (this.gamePhase === 'play' && this.currentPlayer) {

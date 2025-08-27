@@ -913,71 +913,6 @@ body {
     -webkit-backdrop-filter: blur(20px) saturate(180%);
 }
 
-/* Supplemental Score Cards */
-.supplemental-score {
-    margin-top: 8px;
-    display: flex;
-    justify-content: center;
-}
-
-.score-cards {
-    position: relative;
-    width: 80px;
-    height: 40px;
-}
-
-.score-card-container {
-    position: relative;
-    width: 100%;
-    height: 100%;
-}
-
-.score-card {
-    position: absolute;
-    width: 30px;
-    height: 40px;
-    background: white;
-    border: 2px solid #333;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: bold;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    transition: all 0.3s ease;
-    cursor: default;
-}
-
-.score-card.red {
-    color: #e74c3c;
-}
-
-.score-card.black {
-    color: #2c3e50;
-}
-
-/* Default positions for 0 points */
-#team1-card-2, #team2-card-2 {
-    left: 0;
-    bottom: 0;
-}
-
-#team1-card-3, #team2-card-3 {
-    right: 0;
-    bottom: 0;
-}
-
-/* Score positions will be controlled by JavaScript */
-.score-card.position-1 { transform: translateY(-5px); }
-.score-card.position-2 { transform: translateY(-10px); }
-.score-card.position-3 { transform: translateY(-15px); }
-.score-card.position-4 { transform: translateY(-20px); }
-.score-card.position-5 { transform: translateX(10px); }
-.score-card.position-6 { transform: translateX(10px) translateY(-5px); }
-.score-card.position-7 { transform: translateX(10px) translateY(-10px); }
-.score-card.position-8 { transform: translateX(10px) translateY(-15px); }
-.score-card.position-9 { transform: translateX(10px) translateY(-20px); }
 
 /* Trump Display - Under scoreboard */
 .trump-display {
@@ -994,6 +929,73 @@ body {
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     text-align: center;
     border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Footer - Subtle styling */
+.game-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    padding: 6px 15px;
+    z-index: 50;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    font-size: 12px;
+}
+
+.footer-links {
+    display: flex;
+    gap: 15px;
+}
+
+.footer-link {
+    color: rgba(255, 255, 255, 0.4);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.2s ease;
+    font-weight: 400;
+}
+
+.footer-link:hover {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.link-icon {
+    font-size: 12px;
+}
+
+.footer-text {
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 11px;
+}
+
+@media (max-width: 768px) {
+    .footer-content {
+        flex-direction: column;
+        gap: 4px;
+        text-align: center;
+    }
+    
+    .footer-links {
+        gap: 12px;
+    }
+    
+    .footer-content {
+        font-size: 11px;
+    }
 }
 
 /* Turn Indicator - Dual arrows by avatars */
@@ -1271,9 +1273,9 @@ body {
 
 .trump-card-option:hover {
     background: none !important;
-    border-color: transparent;
-    transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    border-color: transparent !important;
+    transform: none !important;
+    box-shadow: none !important;
 }
 
 .pass-btn {

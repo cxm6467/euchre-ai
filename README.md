@@ -24,6 +24,7 @@ A cross-platform Euchre card game built with Electron and web technologies, feat
 - **Web Version**: Also runs in any modern browser or deployed to Vercel
 - **Professional UI**: Clean, intuitive interface with smooth animations
 - **Enhanced Order Up Dialog**: Shows card details and dealer information with avatars
+- **Attribution Footer**: Subtle footer with links to repository and developer profile
 
 ## 🚀 Quick Start
 

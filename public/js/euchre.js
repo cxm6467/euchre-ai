@@ -1122,10 +1122,6 @@ class EuchreGame {
         if (team2ScoreEl) team2ScoreEl.textContent = this.team2Score;
         if (roundEl) roundEl.textContent = this.round;
         
-        // Update supplemental score cards
-        this.updateSupplementalScore(1, this.team1Score);
-        this.updateSupplementalScore(2, this.team2Score);
-        
         // Update tricks display
         if (team1TricksEl) {
             const team1Tricks = (this.players.south?.tricks || 0) + (this.players.north?.tricks || 0);
@@ -1761,40 +1757,6 @@ class EuchreGame {
         this.saveSettings();
     }
 
-    /**
-     * Update supplemental score display using traditional 2 and 3 cards
-     * @param {number} team - Team number (1 or 2) 
-     * @param {number} score - Score from 0-10
-     * @method updateSupplementalScore
-     */
-    updateSupplementalScore(team, score) {
-        const card2 = document.getElementById(`team${team}-card-2`);
-        const card3 = document.getElementById(`team${team}-card-3`);
-        
-        if (!card2 || !card3) return;
-        
-        // Clear existing position classes
-        card2.className = card2.className.replace(/position-\d+/g, '').trim();
-        card3.className = card3.className.replace(/position-\d+/g, '').trim();
-        
-        if (score === 0) {
-            // Both cards at bottom (default position)
-            return;
-        } else if (score <= 4) {
-            // Show score using 2 card position (1-4)
-            card2.classList.add(`position-${score}`);
-        } else if (score <= 9) {
-            // Show 4 on the 2 card, then additional points on 3 card
-            card2.classList.add('position-4');
-            card3.classList.add(`position-${score - 4}`);
-        } else {
-            // Score is 10+ (game won) - both cards at top
-            card2.classList.add('position-4');
-            card3.classList.add('position-5');
-        }
-        
-        console.log(`📊 Team ${team} supplemental score updated to ${score}`);
-    }
 
     
     getRandomDealer() {

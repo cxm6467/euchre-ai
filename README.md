@@ -36,7 +36,7 @@ A cross-platform Euchre card game built with Electron and web technologies, feat
 
 ### Cross-Platform Support
 - **Desktop Apps**: Native Windows (.exe), macOS (.dmg), and Linux (.AppImage)
-- **Android APK**: Native Android app with Capacitor framework
+- **Mobile Apps**: Native Android APK and iOS IPA with Capacitor framework
 - **Web Version**: Runs in any modern browser with Express.js backend
 - **Electron Integration**: Desktop features with Vercel Analytics
 - **PWA Support**: Installable as Progressive Web App on mobile devices
@@ -49,21 +49,22 @@ Download pre-built applications from the [GitHub Releases page](https://github.c
 - **macOS**: Download the `.dmg` file
 - **Linux**: Download the `.AppImage` file
 - **Android**: Download the `.apk` file
+- **iOS**: Download the `.ipa` file (requires iOS developer certificate or jailbreak)
 
 ### Installation Instructions:
 - **Windows**: Run the installer and follow the setup wizard
 - **macOS**: Open the DMG and drag the app to Applications
 - **Linux**: Make the AppImage executable: `chmod +x *.AppImage && ./Euchre-*.AppImage`
 - **Android**: Enable "Install from unknown sources" in Settings → Security, then install the APK
+- **iOS**: Install via Xcode, TestFlight, or with developer certificate (enterprise/jailbreak only for unsigned IPAs)
 
 ## 🚀 Development Setup
 
 ### Prerequisites
 - Node.js 16+ and npm
-- For Android development:
-  - Java 21+ (JDK)
-  - Android Studio with Android SDK
-  - Android SDK Build-Tools
+- For mobile development:
+  - **Android**: Java 21+ (JDK), Android Studio with Android SDK
+  - **iOS**: macOS with Xcode 15+, iOS SDK, CocoaPods
 
 ### Installation
 ```bash
@@ -83,16 +84,18 @@ npm run server
 # Open http://localhost:8080
 ```
 
-### Android Development
+### Mobile Development
 ```bash
-# Sync web assets to Android
+# Sync web assets to both platforms
 npm run cap:sync
 
-# Open in Android Studio
-npx cap open android
+# Android Development
+npx cap open android          # Open in Android Studio
+npm run cap:build            # Build APK directly
 
-# Build APK directly
-npm run cap:build
+# iOS Development  
+npx cap open ios             # Open in Xcode
+npm run cap:build:ios        # Build IPA directly
 ```
 
 ### Development Mode
@@ -119,9 +122,10 @@ npm run build-mac      # Universal binary (x64 + ARM64)
 npm run build-linux    # Portable AppImage
 ```
 
-### Android APK
+### Mobile Apps
 ```bash
-npm run cap:build      # Build release APK
+npm run cap:build         # Build Android APK
+npm run cap:build:ios     # Build iOS IPA
 ```
 
 ## 🧪 Testing
@@ -157,6 +161,9 @@ euchre-game/
 ├── android/                # Android application (Capacitor)
 │   ├── app/               # Android app source
 │   └── gradle files      # Build configuration
+├── ios/                   # iOS application (Capacitor)  
+│   ├── App/               # iOS app source
+│   └── Pods/              # CocoaPods dependencies
 ├── assets/                # Application resources
 │   ├── icon.ico/.icns/.png # Platform-specific icons
 │   └── entitlements.mac.plist # macOS signing configuration
@@ -170,9 +177,9 @@ euchre-game/
 
 ## 🆕 Recent Updates
 
-### v0.1.4 - Mobile & Android Support
-- **🤖 Android APK Generation**: Native Android app with automated CI/CD builds
-- **📱 Mobile-First Design**: Responsive UI optimized for touch devices  
+### v0.1.5+ - Mobile & iOS Support  
+- **📱 Native Mobile Apps**: Both Android APK and iOS IPA with automated builds
+- **🍎 iOS Integration**: Native iOS app with Xcode and CocoaPods support
 - **🏆 Enhanced Victory Screen**: Professional win/loss display with detailed statistics
 - **🔇 Audio System Removed**: Streamlined experience without sound effects
 - **⚡ Performance Improvements**: Optimized card interactions and animations

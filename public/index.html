@@ -21,6 +21,9 @@
                         <button class="new-game-btn" onclick="game.showNewGameConfirm()">
                             New Game
                         </button>
+                        <button class="icon-btn" title="Toggle Sound" id="sound-toggle" onclick="game.toggleSound()">
+                            🔊
+                        </button>
                         <button class="icon-btn" title="How to Play" onclick="game.showHelp()">
                             <i class="fas fa-question-circle"></i>
                         </button>
@@ -47,14 +50,11 @@
                 </div>
                 <div class="trump-display" id="trump-display">Trump: Not Set</div>
                 
-                <div class="turn-indicator" id="turn-indicator">
-                    <div class="turn-arrow" id="turn-arrow"></div>
-                    <div class="turn-text" id="turn-text">Your Turn</div>
-                </div>
                 
                 <div class="player-position top">
                     <div class="player-cards" id="north-cards"></div>
                     <div class="player-avatar-container">
+                        <div class="turn-arrow-small" id="north-turn">▼</div>
                         <div class="player-avatar" id="north-avatar" onclick="game.showAvatarSelector('north')">🤖</div>
                         <div class="avatar-selector" id="north-avatar-selector">
                             <div class="avatar-option" data-avatar="🤖">🤖</div>
@@ -73,6 +73,7 @@
                 <div class="player-position left">
                     <div class="player-cards" id="west-cards"></div>
                     <div class="player-avatar-container">
+                        <div class="turn-arrow-small" id="west-turn">▶</div>
                         <div class="player-avatar" id="west-avatar" onclick="game.showAvatarSelector('west')">🤖</div>
                         <div class="avatar-selector" id="west-avatar-selector">
                             <div class="avatar-option" data-avatar="🤖">🤖</div>
@@ -91,6 +92,7 @@
                 <div class="player-position right">
                     <div class="player-cards" id="east-cards"></div>
                     <div class="player-avatar-container">
+                        <div class="turn-arrow-small" id="east-turn">◀</div>
                         <div class="player-avatar" id="east-avatar" onclick="game.showAvatarSelector('east')">🤖</div>
                         <div class="avatar-selector" id="east-avatar-selector">
                             <div class="avatar-option" data-avatar="🤖">🤖</div>
@@ -109,6 +111,7 @@
                 <div class="player-position bottom">
                     <div class="player-cards" id="south-cards"></div>
                     <div class="player-avatar-container">
+                        <div class="turn-arrow-small" id="south-turn">▲</div>
                         <div class="player-avatar" id="south-avatar" onclick="game.showAvatarSelector('south')">😊</div>
                         <div class="avatar-selector" id="south-avatar-selector">
                             <div class="avatar-option" data-avatar="😊">😊</div>

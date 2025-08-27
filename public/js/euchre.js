@@ -52,6 +52,8 @@ class EuchreGame {
         this.canGoAlone = false;
         this.trumpTurnOrder = [];
         this.dealerDiscardPhase = false;
+        this.gamePhase = 'setup';
+        this.soundEnabled = true;
         
         this.init();
         this.setupSettingsEventListeners();
@@ -457,7 +459,9 @@ class EuchreGame {
                     </div>
                 </div>
             `;
-            dialog.querySelector('h3').textContent = `Order up the ${this.flippedCard.rank}${this.flippedCard.suit}?`;
+            const dealerName = this.playerSettings[this.currentDealer]?.name || this.currentDealer;
+            const dealerAvatar = this.playerSettings[this.currentDealer]?.avatar || '🤖';
+            dialog.querySelector('h3').innerHTML = `Order up the ${this.flippedCard.rank}${this.flippedCard.suit} to ${dealerAvatar} ${dealerName}?`;
         } else {
             // Second round: all suits except flipped
             const availableSuits = [
@@ -490,6 +494,9 @@ class EuchreGame {
      */
     selectTrump(suit) {
         this.trump = suit;
+        
+        // Play trump selection sound
+        this.playSound('trumpSelect');
         
         // If it's the player's turn, show alone option
         if (this.trumpSelectionPlayer === 'south') {
@@ -543,6 +550,12 @@ class EuchreGame {
     }
     
     startPlay() {
+        // Set game phase to enable turn indicator
+        this.gamePhase = 'play';
+        
+        // Play start sound effect
+        this.playSound('gameStart');
+        
         // Start play with player to left of dealer
         setTimeout(() => {
             const dealerOrder = ['south', 'west', 'north', 'east'];
@@ -637,6 +650,10 @@ class EuchreGame {
         this.players[player].cards.splice(cardIndex, 1);
         
         this.currentTrick.push({ player, card });
+        
+        // Play card sound effect
+        this.playSound('cardPlay');
+        
         this.displayTrick();
         this.displayCards();
         
@@ -915,6 +932,9 @@ class EuchreGame {
                 const winnerName = this.playerSettings[winner.player]?.name || winner.player;
                 this.showMessage(`${winnerName} wins the trick!`);
                 
+                // Play trick won sound
+                this.playSound('trickWon');
+                
                 // Clear trick and handle next turn
                 setTimeout(() => this.processTrickCompletion(winner), 2000);
             } else {
@@ -1073,6 +1093,9 @@ class EuchreGame {
         this.trumpSelectionRound = 1;
         this.flippedCard = null;
         this.passedPlayers = [];
+        
+        // Refresh NPC profiles on new game
+        this.initializeRandomNPCs();
         this.playingAlone = false;
         this.alonePlayer = null;
         this.kitty = [];
@@ -1445,9 +1468,13 @@ class EuchreGame {
     }
     
     saveSettings() {
-        // Save player settings to localStorage
+        // Save player settings and game options to localStorage
         try {
-            localStorage.setItem('euchre-player-settings', JSON.stringify(this.playerSettings));
+            const settings = {
+                players: this.playerSettings,
+                soundEnabled: this.soundEnabled
+            };
+            localStorage.setItem('euchre-player-settings', JSON.stringify(settings));
         } catch (e) {
             console.error('Error saving settings:', e);
         }
@@ -1457,7 +1484,38 @@ class EuchreGame {
         try {
             const saved = localStorage.getItem('euchre-player-settings');
             if (saved) {
-                this.playerSettings = { ...this.playerSettings, ...JSON.parse(saved) };
+                const savedSettings = JSON.parse(saved);
+                
+                // Handle both old and new format
+                if (savedSettings.players) {
+                    // New format with sound settings
+                    this.playerSettings = { ...this.playerSettings, ...savedSettings.players };
+                    this.soundEnabled = savedSettings.soundEnabled ?? true;
+                } else {
+                    // Old format - just player settings
+                    this.playerSettings = { ...this.playerSettings, ...savedSettings };
+                }
+                
+                // Update sound button UI
+                const soundBtn = document.getElementById('sound-toggle');
+                if (soundBtn) {
+                    soundBtn.textContent = this.soundEnabled ? '🔊' : '🔇';
+                }
+                
+                // Check if saved settings have default names and need randomization
+                const playerData = savedSettings.players || savedSettings;
+                const needsRandomization = 
+                    playerData.north?.name === 'North (Partner)' ||
+                    playerData.east?.name === 'East' ||
+                    playerData.west?.name === 'West' ||
+                    playerData.north?.name?.includes('North') ||
+                    playerData.east?.name?.includes('East') ||
+                    playerData.west?.name?.includes('West');
+                    
+                if (needsRandomization) {
+                    console.log('🎲 Refreshing NPC profiles...');
+                    this.initializeRandomNPCs();
+                }
             } else {
                 // First time - set random NPC profiles
                 this.initializeRandomNPCs();
@@ -1475,13 +1533,19 @@ class EuchreGame {
      * Assigns unique character profiles to north, east, and west players
      */
     initializeRandomNPCs() {
+        console.log('🎲 Initializing random NPC profiles...');
         ['north', 'east', 'west'].forEach(player => {
             const profile = this.getRandomNPCProfile(player);
             this.playerSettings[player].name = profile.name;
             this.playerSettings[player].avatar = profile.avatar;
+            console.log(`✨ ${player}: ${profile.name} ${profile.avatar}`);
         });
-        // Save the random settings
+        // Save the random settings and update display
         this.saveSettings();
+        // Update the UI display if DOM is ready
+        if (typeof document !== 'undefined') {
+            this.updatePlayerDisplay();
+        }
     }
     
     setDealerChip() {
@@ -1601,6 +1665,96 @@ class EuchreGame {
             west: 'east'
         };
         return partners[player];
+    }
+    
+    /**
+     * Initialize audio context after user gesture to comply with browser autoplay policies
+     * @method initAudioContext
+     */
+    initAudioContext() {
+        if (!this.audioContext && this.soundEnabled) {
+            try {
+                this.audioContext = new (window.AudioContext || window['webkitAudioContext'])();
+                if (this.audioContext.state === 'suspended') {
+                    this.audioContext.resume();
+                }
+            } catch (error) {
+                console.log('🔇 Audio not supported');
+            }
+        }
+    }
+
+    /**
+     * Play sound effect if sounds are enabled
+     * @param {string} soundType - Type of sound to play
+     */
+    playSound(soundType) {
+        if (!this.soundEnabled) return;
+        
+        // Initialize audio context if needed
+        this.initAudioContext();
+        if (!this.audioContext) return;
+        
+        try {
+            const oscillator = this.audioContext.createOscillator();
+            const gainNode = this.audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(this.audioContext.destination);
+            
+            // Different sounds for different actions
+            switch (soundType) {
+                case 'cardPlay':
+                    oscillator.frequency.setValueAtTime(440, this.audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(220, this.audioContext.currentTime + 0.1);
+                    gainNode.gain.setValueAtTime(0.1, this.audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.1);
+                    oscillator.start();
+                    oscillator.stop(this.audioContext.currentTime + 0.1);
+                    break;
+                case 'trumpSelect':
+                    oscillator.frequency.setValueAtTime(523, this.audioContext.currentTime);
+                    oscillator.frequency.setValueAtTime(659, this.audioContext.currentTime + 0.1);
+                    oscillator.frequency.setValueAtTime(784, this.audioContext.currentTime + 0.2);
+                    gainNode.gain.setValueAtTime(0.1, this.audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.3);
+                    oscillator.start();
+                    oscillator.stop(this.audioContext.currentTime + 0.3);
+                    break;
+                case 'gameStart':
+                    oscillator.frequency.setValueAtTime(349, this.audioContext.currentTime);
+                    oscillator.frequency.setValueAtTime(440, this.audioContext.currentTime + 0.2);
+                    gainNode.gain.setValueAtTime(0.08, this.audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.4);
+                    oscillator.start();
+                    oscillator.stop(this.audioContext.currentTime + 0.4);
+                    break;
+                case 'trickWon':
+                    oscillator.frequency.setValueAtTime(523, this.audioContext.currentTime);
+                    gainNode.gain.setValueAtTime(0.1, this.audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.2);
+                    oscillator.start();
+                    oscillator.stop(this.audioContext.currentTime + 0.2);
+                    break;
+                default:
+                    return;
+            }
+        } catch (error) {
+            console.log('🔇 Audio playback error:', error);
+        }
+    }
+    
+    /**
+     * Toggle sound effects on/off and update UI
+     * @method toggleSound
+     */
+    toggleSound() {
+        this.soundEnabled = !this.soundEnabled;
+        const soundBtn = document.getElementById('sound-toggle');
+        if (soundBtn) {
+            soundBtn.textContent = this.soundEnabled ? '🔊' : '🔇';
+        }
+        this.saveSettings();
     }
     
     getRandomDealer() {
@@ -1753,51 +1907,26 @@ class EuchreGame {
     }
     
     /**
-     * Update the turn indicator to show whose turn it is
+     * Update turn indicator to show whose turn it is with small arrows by avatars
      * @method updateTurnIndicator
      */
     updateTurnIndicator() {
-        const indicator = document.getElementById('turn-indicator');
-        const arrow = document.getElementById('turn-arrow');
-        const text = document.getElementById('turn-text');
+        // Hide all turn arrows first
+        const allArrows = ['north-turn', 'east-turn', 'south-turn', 'west-turn'];
+        allArrows.forEach(arrowId => {
+            const arrow = document.getElementById(arrowId);
+            if (arrow) arrow.classList.remove('active');
+        });
         
-        if (!indicator || !arrow || !text) return;
-        
-        // Show indicator during card play phase only
-        if (this.gamePhase === 'play') {
-            indicator.classList.add('active');
-            
-            const playerName = this.playerSettings[this.currentPlayer]?.name || this.currentPlayer;
-            const isYourTurn = this.currentPlayer === 'south';
-            
-            // Update text and direction
-            text.textContent = isYourTurn ? 'Your Turn!' : `${playerName}'s Turn`;
-            
-            // Clear previous direction classes
-            indicator.classList.remove('pointing-north', 'pointing-east', 'pointing-south', 'pointing-west');
-            
-            // Add direction class based on current player
-            const directionMap = {
-                north: 'pointing-north',
-                east: 'pointing-east',
-                south: 'pointing-south',
-                west: 'pointing-west'
-            };
-            
-            indicator.classList.add(directionMap[this.currentPlayer]);
-            
-            // Different styling for your turn
-            if (isYourTurn) {
-                indicator.style.background = 'linear-gradient(135deg, #e74c3c, #c0392b)';
-                indicator.style.boxShadow = '0 4px 15px rgba(231, 76, 60, 0.4)';
-            } else {
-                indicator.style.background = 'linear-gradient(135deg, #27ae60, #2ecc71)';
-                indicator.style.boxShadow = '0 4px 15px rgba(39, 174, 96, 0.3)';
+        // Show arrow for current player during card play phase
+        if (this.gamePhase === 'play' && this.currentPlayer) {
+            const currentArrow = document.getElementById(`${this.currentPlayer}-turn`);
+            if (currentArrow) {
+                currentArrow.classList.add('active');
+                
+                const playerName = this.playerSettings[this.currentPlayer]?.name || this.currentPlayer;
+                console.log(`🎯 Turn indicator: ${playerName} (${this.currentPlayer})`);
             }
-            
-            console.log(`🎯 Turn indicator: ${playerName} (${this.currentPlayer})`);
-        } else {
-            indicator.classList.remove('active');
         }
     }
 }

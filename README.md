@@ -7,6 +7,9 @@ A cross-platform Euchre card game built with Electron and web technologies, feat
 - **Authentic Euchre Rules**: Complete implementation including trump selection, going alone, stick the dealer
 - **Smart AI Opponents**: Multiple difficulty levels with intelligent card play
 - **Player Customization**: Custom names and avatar selection with emoji options
+- **Random NPC Profiles**: Auto-generated names and avatars for AI opponents that refresh each game
+- **Sound Effects**: Synthesized audio feedback for game actions with mute option
+- **Visual Turn Indicator**: Bouncing arrows by player avatars show whose turn it is
 - **Card Back Themes**: 5 stunning card back designs with intricate patterns
   - **Classic Blue**: Diamond lattice pattern with sparkling accents
   - **Royal Red**: Sophisticated crosshatch weave design
@@ -20,6 +23,7 @@ A cross-platform Euchre card game built with Electron and web technologies, feat
 - **Cross-Platform**: Native Windows, macOS, and Linux applications
 - **Web Version**: Also runs in any modern browser or deployed to Vercel
 - **Professional UI**: Clean, intuitive interface with smooth animations
+- **Enhanced Order Up Dialog**: Shows card details and dealer information with avatars
 
 ## 🚀 Quick Start
 

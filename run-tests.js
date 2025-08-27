@@ -10,24 +10,29 @@ const path = require('path');
 
 // Create complete DOM mock environment
 function setupMockEnvironment() {
+    const mockElement = {
+        innerHTML: '',
+        textContent: '',
+        style: {},
+        className: '',
+        classList: {
+            add: () => {},
+            remove: () => {},
+            contains: () => false
+        },
+        appendChild: () => {},
+        removeChild: () => {},
+        querySelector: () => mockElement,
+        querySelectorAll: () => [mockElement],
+        addEventListener: () => {},
+        onclick: null,
+        value: '',
+        outerHTML: '<span></span>',
+        dataset: {}
+    };
+
     global.document = {
-        getElementById: (id) => ({
-            innerHTML: '',
-            textContent: '',
-            style: {},
-            classList: {
-                add: () => {},
-                remove: () => {},
-                contains: () => false
-            },
-            appendChild: () => {},
-            removeChild: () => {},
-            querySelector: () => null,
-            querySelectorAll: () => [],
-            addEventListener: () => {},
-            onclick: null,
-            value: ''
-        }),
+        getElementById: (id) => mockElement,
         createElement: (tag) => ({
             tagName: tag.toUpperCase(),
             innerHTML: '',
@@ -79,46 +84,56 @@ async function runTests() {
             throw new Error('EuchreGame class not properly loaded');
         }
         
-        console.log('✅ EuchreGame class loaded');
+        console.log('✅ EuchreGame class loaded successfully');
         
         // Simple functionality tests
         console.log('\n🧪 Running basic functionality tests...');
         
-        const game = new EuchreGame();
+        let game;
+        try {
+            game = new EuchreGame();
+            // Disable sound during tests
+            game.soundEnabled = false;
+            console.log('✅ Game instance created');
         
-        // Test 1: Deck creation
-        game.createDeck();
-        console.log(game.deck.length === 24 ? '✅ Deck creation (24 cards)' : '❌ Deck creation failed');
-        
-        // Test 2: Card dealing
-        game.dealCards();
-        const totalCards = Object.values(game.players).reduce((sum, player) => sum + player.cards.length, 0);
-        console.log(totalCards === 20 ? '✅ Card dealing (20 cards to players)' : '❌ Card dealing failed');
-        
-        // Test 3: Trump selection
-        game.trump = '♠';
-        console.log(game.trump === '♠' ? '✅ Trump selection' : '❌ Trump selection failed');
-        
-        // Test 4: Partner logic
-        console.log(game.getPartner('south') === 'north' ? '✅ Partner logic' : '❌ Partner logic failed');
-        console.log(game.getPartner('east') === 'west' ? '✅ Partner logic (east-west)' : '❌ Partner logic failed');
-        
-        // Test 5: Alone play setup
-        game.playingAlone = true;
-        game.alonePlayer = 'north';
-        console.log(game.playingAlone && game.alonePlayer === 'north' ? '✅ Alone play setup' : '❌ Alone play setup failed');
-        
-        // Test 6: Card values (bower logic)
-        const rightBower = { rank: 'J', suit: '♠' };
-        const leftBower = { rank: 'J', suit: '♣' };
-        const rightValue = game.getCardValue(rightBower, '♠', null);
-        const leftValue = game.getCardValue(leftBower, '♠', null);
-        console.log(rightValue > leftValue ? '✅ Bower hierarchy' : '❌ Bower hierarchy failed');
-        
-        console.log('\n📊 Basic functionality tests completed!');
-        console.log('✅ Core game mechanics are working correctly');
-        
-        return true;
+            // Test 1: Deck creation
+            game.createDeck();
+            console.log(game.deck.length === 24 ? '✅ Deck creation (24 cards)' : `❌ Deck creation failed: ${game.deck.length} cards`);
+            
+            // Test 2: Card dealing
+            game.dealCards();
+            const totalCards = Object.values(game.players).reduce((sum, player) => sum + player.cards.length, 0);
+            console.log(totalCards === 20 ? '✅ Card dealing (20 cards to players)' : '❌ Card dealing failed');
+            
+            // Test 3: Trump selection
+            game.trump = '♠';
+            console.log(game.trump === '♠' ? '✅ Trump selection' : '❌ Trump selection failed');
+            
+            // Test 4: Partner logic
+            console.log(game.getPartner('south') === 'north' ? '✅ Partner logic' : '❌ Partner logic failed');
+            console.log(game.getPartner('east') === 'west' ? '✅ Partner logic (east-west)' : '❌ Partner logic failed');
+            
+            // Test 5: Alone play setup
+            game.playingAlone = true;
+            game.alonePlayer = 'north';
+            console.log(game.playingAlone && game.alonePlayer === 'north' ? '✅ Alone play setup' : '❌ Alone play setup failed');
+            
+            // Test 6: Card values (bower logic)
+            const rightBower = { rank: 'J', suit: '♠' };
+            const leftBower = { rank: 'J', suit: '♣' };
+            const rightValue = game.getCardValue(rightBower, '♠', null);
+            const leftValue = game.getCardValue(leftBower, '♠', null);
+            console.log(rightValue > leftValue ? '✅ Bower hierarchy' : '❌ Bower hierarchy failed');
+            
+            console.log('\n📊 Basic functionality tests completed!');
+            console.log('✅ Core game mechanics are working correctly');
+            
+            return true;
+            
+        } catch (gameError) {
+            console.error('❌ Game instance creation failed:', gameError.message);
+            return false;
+        }
         
     } catch (error) {
         console.error('❌ Test execution failed:', error.message);

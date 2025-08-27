@@ -1,0 +1,105 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            build_cmd: build-linux
+            artifact_pattern: "dist/*.AppImage"
+            artifact_name: "linux-appimage"
+          - os: windows-latest
+            platform: windows
+            build_cmd: build-win
+            artifact_pattern: "dist/*.exe"
+            artifact_name: "windows-installer"
+          - os: macos-latest
+            platform: macos
+            build_cmd: build-mac
+            artifact_pattern: "dist/*.dmg"
+            artifact_name: "macos-dmg"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build for ${{ matrix.platform }}
+        run: npm run ${{ matrix.build_cmd }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.artifact_pattern }}
+          retention-days: 7
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+
+      - name: Display downloaded artifacts
+        run: find ./artifacts -type f -exec ls -la {} \;
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            artifacts/**/*.exe
+            artifacts/**/*.dmg
+            artifacts/**/*.AppImage
+          name: Release ${{ github.ref_name }}
+          body: |
+            ## 🎮 Euchre Game ${{ github.ref_name }}
+            
+            Download the appropriate installer for your platform:
+            
+            - **Windows**: Download the `.exe` file
+            - **macOS**: Download the `.dmg` file  
+            - **Linux**: Download the `.AppImage` file
+            
+            ### Installation Instructions:
+            - **Windows**: Run the installer and follow the setup wizard
+            - **macOS**: Open the DMG and drag the app to Applications
+            - **Linux**: Make the AppImage executable and run: `chmod +x *.AppImage && ./Euchre-*.AppImage`
+            
+            ### What's New:
+            See the commit history for detailed changes in this release.
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

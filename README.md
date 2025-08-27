@@ -1,38 +1,67 @@
 # 🃏 Euchre Game
 
-A cross-platform Euchre card game built with Electron and web technologies, featuring AI opponents and authentic Euchre gameplay.
+[![Build Status](https://github.com/cxm6467/euchre-game/actions/workflows/build.yml/badge.svg)](https://github.com/cxm6467/euchre-game/actions/workflows/build.yml)
+
+A cross-platform Euchre card game built with Electron and web technologies, featuring intelligent AI opponents and authentic Euchre gameplay with comprehensive rules implementation.
 
 ## 🎮 Features
 
-- **Authentic Euchre Rules**: Complete implementation including trump selection, going alone, stick the dealer
-- **Smart AI Opponents**: Multiple difficulty levels with intelligent card play
-- **Player Customization**: Custom names and avatar selection with emoji options
-- **Random NPC Profiles**: Auto-generated names and avatars for AI opponents that refresh each game
-- **Sound Effects**: Synthesized audio feedback for game actions with mute option
-- **Visual Turn Indicator**: Bouncing arrows by player avatars show whose turn it is
-- **Card Back Themes**: 5 stunning card back designs with intricate patterns
-  - **Classic Blue**: Diamond lattice pattern with sparkling accents
-  - **Royal Red**: Sophisticated crosshatch weave design
-  - **Forest Green**: Mesmerizing swirling conic gradient
-  - **Royal Purple**: Radiating segments with diagonal overlays
-  - **Golden Elegance**: Luxury striped pattern with metallic highlights
-- **Dealer Pickup/Discard**: Proper Euchre mechanic where dealer picks up flipped card and discards
-- **Statistics Tracking**: Win/loss records and performance metrics
-- **Random Dealer**: Any player can start as dealer, not just the user
-- **Mobile Responsive**: Touch-friendly design that works on all screen sizes
-- **Cross-Platform**: Native Windows, macOS, and Linux applications
-- **Web Version**: Also runs in any modern browser or deployed to Vercel
-- **Professional UI**: Clean, intuitive interface with smooth animations
-- **Enhanced Order Up Dialog**: Shows card details and dealer information with avatars
-- **Attribution Footer**: Subtle footer with links to repository and developer profile
+### Game Mechanics
+- **Authentic Euchre Rules**: Complete implementation with all traditional rules
+- **Trump Selection**: Multi-round bidding with "order up", "assist", and color calling
+- **Going Alone**: Optional solo play for higher scoring potential
+- **Stick the Dealer**: Dealer must choose trump if all players pass
+- **Dealer Mechanics**: Proper card pickup and discard system
+- **Bower System**: Right bower (Jack of trump) and left bower (Jack of same color)
 
-## 🚀 Quick Start
+### AI & Gameplay
+- **Intelligent AI Opponents**: Three difficulty levels with strategic card play
+- **Partnership Teams**: You & North vs. East & West team dynamics
+- **Random Dealer**: Dealer position rotates, can start with any player
+- **Trick-Taking Logic**: Proper suit following and trump hierarchy
+- **Score Tracking**: First team to 10 points wins
+
+### Interface & Customization
+- **Player Profiles**: Customizable names and emoji avatars
+- **Visual Turn Indicators**: Player name highlighting shows current turn
+- **Card Back Themes**: 5 elegant card back designs to choose from
+  - Classic Blue (diamond lattice)
+  - Royal Red (crosshatch weave) 
+  - Forest Green (swirling gradient)
+  - Royal Purple (radiating segments)
+  - Golden Elegance (striped metallic)
+- **Sound Effects**: Synthesized audio with mute toggle
+- **Statistics Tracking**: Win/loss records and game metrics
+- **Mobile Responsive**: Touch-optimized for all screen sizes
+
+### Cross-Platform Support
+- **Desktop Apps**: Native Windows (.exe), macOS (.dmg), and Linux (.AppImage)
+- **Web Version**: Runs in any modern browser with Express.js backend
+- **Electron Integration**: Desktop features with Vercel Analytics
+- **PWA Support**: Installable as Progressive Web App on mobile
+
+## 📦 Downloads
+
+Download pre-built applications from the [GitHub Releases page](https://github.com/cxm6467/euchre-game/releases):
+
+- **Windows**: Download the `.exe` installer
+- **macOS**: Download the `.dmg` file
+- **Linux**: Download the `.AppImage` file
+
+### Installation Instructions:
+- **Windows**: Run the installer and follow the setup wizard
+- **macOS**: Open the DMG and drag the app to Applications
+- **Linux**: Make the AppImage executable: `chmod +x *.AppImage && ./Euchre-*.AppImage`
+
+## 🚀 Development Setup
 
 ### Prerequisites
 - Node.js 16+ and npm
 
 ### Installation
 ```bash
+git clone https://github.com/cxm6467/euchre-game.git
+cd euchre-game
 npm install
 ```
 
@@ -47,145 +76,154 @@ npm run server
 # Open http://localhost:8080
 ```
 
-### Deploy to Vercel
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/cxm6467/euchre-game)
-
-Or deploy manually:
-```bash
-npm install -g vercel
-vercel --prod
-```
-
 ### Development Mode
 ```bash
-npm run dev  # Desktop with DevTools
-npm run dev-web  # Web server with logging
+npm run dev      # Desktop with DevTools and hot reload
+npm run dev-web  # Web server with development logging
 ```
 
-## 🔨 Building
+## 🔨 Building Executables
 
-### Windows (.exe)
+### Windows (.exe installer)
 ```bash
-npm run build-win     # 64-bit
-npm run build-win32   # 32-bit
+npm run build-win      # 64-bit NSIS installer
+npm run build-win32    # 32-bit version
 ```
 
 ### macOS (.dmg)
 ```bash
-npm run build-mac
+npm run build-mac      # Universal binary (x64 + ARM64)
 ```
 
 ### Linux (AppImage)
 ```bash
-npm run build-linux
+npm run build-linux    # Portable AppImage
 ```
 
-## 📱 Mobile & Web Deployment
+## 🧪 Testing
 
-### Mobile-First Design
-- **Responsive Layout**: Adapts to all screen sizes from phones to tablets
-- **Touch Controls**: Optimized for touch interactions
-- **Performance**: Smooth animations even on mobile devices
-- **PWA Ready**: Can be installed as a Progressive Web App
-
-### Vercel Deployment
-The game is optimized for zero-config serverless deployment on Vercel:
-- Static file serving from `/public` directory with automatic detection
-- Single-page application routing with fallback to index.html
-- No server-side dependencies required for gameplay
-- Fast global CDN delivery with edge optimization
-- Automatic HTTPS and custom domains
-- One-click deployment from GitHub repository
-
-## 📁 Project Structure
-
-```
-euchre-game/ (root)
-├── public/                 # Web application files (auto-served by Vercel)
-│   ├── css/
-│   │   └── styles.css     # Responsive styling with intricate card patterns
-│   ├── js/
-│   │   └── euchre.js      # Complete game logic with JSDoc documentation
-│   └── index.html         # Mobile-optimized HTML with PWA support
-├── assets/                # Application icons and resources
-├── main.js               # Electron main process
-├── server.js             # Express server for local development
-├── preload.js            # Electron preload script
-├── package.json          # Dependencies and build scripts
-├── vercel.json           # Simplified Vercel deployment configuration
-├── commitlint.config.js  # Commit message linting
-└── .gitignore           # Git ignore rules
+### Run Tests
+```bash
+npm test           # Run comprehensive game logic tests
+npm run test:watch # Watch mode for development
 ```
 
-## 🎯 Game Rules
+### Validation
+```bash
+npm run validate   # Run linting and tests
+npm run lint       # Code quality checks
+```
 
-Euchre is a trick-taking card game for 4 players in 2 partnerships. The goal is to be the first team to reach 10 points.
+## 📁 Project Architecture
+
+```
+euchre-game/
+├── .github/workflows/        # CI/CD pipeline
+│   └── build.yml            # Automated builds and releases
+├── public/                  # Web application
+│   ├── css/styles.css      # Responsive UI with card themes
+│   ├── js/euchre.js        # Core game engine (1000+ lines)
+│   └── index.html          # Mobile-optimized interface
+├── electron/               # Desktop application
+│   ├── main.js            # Main process with window management
+│   └── preload.js         # Secure renderer communication
+├── assets/                # Application resources
+│   ├── icon.ico/.icns/.png # Platform-specific icons
+│   └── entitlements.mac.plist # macOS signing configuration
+├── tests/                 # Test suite
+│   └── euchre.test.js     # Comprehensive unit tests
+├── server.js             # Express.js web server with API
+├── run-tests.js          # Node.js test runner
+├── package.json          # Dependencies and build configuration
+└── game-stats.json       # Persistent statistics storage
+```
+
+## 🎯 Game Rules & Scoring
 
 ### Basic Gameplay
-1. **Dealing**: 5 cards per player, flip top card for trump selection
-2. **Trump Selection**: Players can order up, assist, or name trump
-3. **Playing**: Follow suit if possible, highest trump or suit wins trick
-4. **Scoring**: 3+ tricks = 1 point, 5 tricks = 2 points, going alone can score 4 points
+1. **Setup**: 24-card deck (9, 10, J, Q, K, A), 4 players, 2 teams
+2. **Dealing**: 5 cards per player, flip top card for trump selection
+3. **Trump Selection**: 
+   - Round 1: Players can "order up" the flipped card
+   - Round 2: Players can call any suit except the flipped suit
+   - Stick the dealer: Dealer must choose if all pass
+4. **Playing**: Follow suit, highest card wins trick
+5. **Scoring**: Team needs 3+ tricks to score
 
-### Special Rules
-- **Right Bower**: Jack of trump suit (highest card)
-- **Left Bower**: Jack of same color as trump (second highest)
-- **Going Alone**: Play without partner for extra points
-- **Stick the Dealer**: Dealer must choose trump if everyone passes
+### Scoring System
+- **3-4 tricks**: 1 point
+- **All 5 tricks (march)**: 2 points  
+- **Going alone (3-4 tricks)**: 1 point
+- **Going alone (all 5 tricks)**: 4 points
+- **Euchred**: Opposing team scores 2 points
+- **First to 10 points wins**
 
-## 🛠️ Development
+### Special Cards (Trump Suit)
+1. **Right Bower**: Jack of trump suit (highest)
+2. **Left Bower**: Jack of same color as trump (2nd highest)
+3. **Ace, King, Queen, 10, 9** of trump suit (in descending order)
 
-### Commit Guidelines
+## 🛠️ Development & API
 
-This project uses conventional commits. Format your commit messages as:
-
-```
-type(scope): description
-
-[optional body]
-
-[optional footer]
-```
-
-**Types:**
-- `feat`: New features
-- `fix`: Bug fixes
-- `docs`: Documentation changes
-- `style`: Code formatting
-- `refactor`: Code restructuring
-- `perf`: Performance improvements
-- `test`: Adding/updating tests
-- `chore`: Build/tool changes
-
-**Examples:**
-- `feat(game): add difficulty selection`
-- `fix(ai): correct trump selection logic`
-- `docs(readme): update installation instructions`
-
-### API Endpoints
-- `GET /api/stats` - Get game statistics
-- `POST /api/stats` - Save statistics
+### REST API Endpoints
+- `GET /api/stats` - Retrieve game statistics
+- `POST /api/stats` - Update game statistics  
 - `POST /api/stats/reset` - Reset statistics
 
-### Technologies Used
-- **Frontend**: HTML5, CSS3, JavaScript (ES6+)
-- **Desktop**: Electron with Vercel Analytics integration
-- **Server**: Express.js (for web version)
-- **Analytics**: Vercel Analytics for usage tracking
-- **Build**: electron-builder
-- **Linting**: commitlint with conventional commits
+### Electron IPC Events
+- `get-stats` / `set-stats` - Statistics management
+- `new-game` - Start new game
+- `difficulty-changed` - AI difficulty updates
 
-## 📝 License
+### Architecture Features
+- **Dual Environment**: Works as both Electron app and web application
+- **State Management**: Centralized game state with persistence
+- **Analytics Integration**: Vercel Analytics for usage tracking
+- **Error Handling**: Comprehensive error management and recovery
+- **Mobile Support**: Touch events and responsive breakpoints
 
-MIT License
+## 🎨 Customization
+
+### Player Settings
+- Custom names and emoji avatars
+- AI opponent profile randomization
+- Sound preferences and mute controls
+
+### Visual Themes
+- 5 intricate card back designs
+- Smooth animations and transitions
+- Professional UI with subtle effects
+
+## 🔄 Continuous Integration
+
+The project uses GitHub Actions for automated:
+- **Multi-platform builds** (Windows, macOS, Linux)
+- **Automated testing** on all platforms
+- **Release management** with version tagging
+- **Artifact distribution** via GitHub Releases
+
+## 📝 Commit Guidelines
+
+Uses conventional commits with automatic linting:
+
+```
+feat(game): add difficulty selection
+fix(ai): correct trump selection logic  
+docs(readme): update installation guide
+```
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch
-3. Follow commit message conventions
-4. Test your changes thoroughly
-5. Submit a pull request
+2. Create feature branch (`git checkout -b feature/amazing-feature`)
+3. Follow commit conventions
+4. Run tests (`npm test`)
+5. Submit pull request
+
+## 📄 License
+
+MIT License - see LICENSE file for details
 
 ---
-Made with ❤️ using Electron + Node.js
+
+**Built with Electron, Node.js, and modern web technologies**

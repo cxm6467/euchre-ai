@@ -347,6 +347,29 @@
                         <button class="settings-btn secondary" onclick="game.hideSettings()">Cancel</button>
                     </div>
                 </div>
+                
+                <!-- Victory Modal -->
+                <div class="victory-modal" id="victory-modal">
+                    <div class="victory-content">
+                        <h2 id="victory-title">🎉 Victory! 🎉</h2>
+                        <p id="victory-message">You and your partner win the game!</p>
+                        
+                        <div class="victory-score-section">
+                            <h3>Final Score</h3>
+                            <div id="victory-final-score"></div>
+                        </div>
+                        
+                        <div class="victory-stats-section">
+                            <h3>Game Statistics</h3>
+                            <div id="victory-stats"></div>
+                        </div>
+                        
+                        <div class="victory-buttons">
+                            <button class="victory-btn primary" onclick="game.startNewGameFromVictory()">Play Again</button>
+                            <button class="victory-btn secondary" onclick="game.hideVictoryScreen()">Close</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

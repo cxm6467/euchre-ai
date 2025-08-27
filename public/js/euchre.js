@@ -1094,16 +1094,99 @@ class EuchreGame {
     endGame(team1Won) {
         if (team1Won) {
             this.stats.gamesWon++;
-            this.showMessage(`🎉 ${this.playerSettings.south.name} & ${this.playerSettings.north.name} win the game! 🎉`);
         } else {
             this.stats.gamesLost++;
-            this.showMessage(`Game over - ${this.playerSettings.east.name} & ${this.playerSettings.west.name} win!`);
         }
         
         this.updateStats();
         this.saveStats();
         
-        setTimeout(() => this.newGame(), 4000);
+        // Show victory modal instead of just a message
+        this.showVictoryScreen(team1Won);
+    }
+    
+    /**
+     * Show victory screen with game results and statistics
+     * @param {boolean} team1Won - True if player's team won
+     */
+    showVictoryScreen(team1Won) {
+        const modal = document.getElementById('victory-modal');
+        if (!modal) return;
+        
+        // Update victory content
+        const title = document.getElementById('victory-title');
+        const message = document.getElementById('victory-message');
+        const finalScore = document.getElementById('victory-final-score');
+        const gameStats = document.getElementById('victory-stats');
+        
+        if (team1Won) {
+            title.textContent = '🎉 Victory! 🎉';
+            title.style.color = '#27ae60';
+            message.textContent = `${this.playerSettings.south.name} & ${this.playerSettings.north.name} win the game!`;
+        } else {
+            title.textContent = 'Game Over';
+            title.style.color = '#e74c3c';
+            message.textContent = `${this.playerSettings.east.name} & ${this.playerSettings.west.name} win the game!`;
+        }
+        
+        // Show final score
+        finalScore.innerHTML = `
+            <div class="score-breakdown">
+                <div class="team-score ${team1Won ? 'winner' : ''}">
+                    <span class="team-name">${this.playerSettings.south.name} & ${this.playerSettings.north.name}</span>
+                    <span class="score">${this.team1Score}</span>
+                </div>
+                <div class="score-separator">-</div>
+                <div class="team-score ${!team1Won ? 'winner' : ''}">
+                    <span class="team-name">${this.playerSettings.east.name} & ${this.playerSettings.west.name}</span>
+                    <span class="score">${this.team2Score}</span>
+                </div>
+            </div>
+        `;
+        
+        // Show game statistics
+        const totalGames = this.stats.gamesWon + this.stats.gamesLost;
+        const winRate = totalGames > 0 ? Math.round((this.stats.gamesWon / totalGames) * 100) : 0;
+        
+        gameStats.innerHTML = `
+            <div class="stat-row">
+                <span class="stat-label">Games Won:</span>
+                <span class="stat-value">${this.stats.gamesWon}</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Games Lost:</span>
+                <span class="stat-value">${this.stats.gamesLost}</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Win Rate:</span>
+                <span class="stat-value">${winRate}%</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Hands Played:</span>
+                <span class="stat-value">${this.stats.handsPlayed}</span>
+            </div>
+        `;
+        
+        // Show modal
+        modal.classList.add('active');
+    }
+    
+    /**
+     * Hide victory screen
+     */
+    hideVictoryScreen() {
+        const modal = document.getElementById('victory-modal');
+        if (modal) {
+            modal.classList.remove('active');
+        }
+    }
+    
+    /**
+     * Start a new game from victory screen
+     */
+    startNewGameFromVictory() {
+        this.hideVictoryScreen();
+        this.newGame();
     }
     
     newGame() {

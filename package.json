@@ -2,19 +2,21 @@
   "name": "euchre-game",
   "version": "1.0.0",
   "description": "Cross-platform Euchre card game with AI opponents",
-  "main": "main.js",
+  "main": "electron/main.js",
   "scripts": {
     "start": "electron .",
     "start-win": "electron.cmd .",
     "server": "node server.js",
     "web": "node server.js",
-    "dev": "concurrently \"npm run server\" \"electron . --dev\"",
+    "dev": "concurrently -k -r \"npm run server\" \"wait-on http://localhost:8080 && cross-env NODE_ENV=development electron .\"",
     "dev-web": "node server.js --dev",
     "test": "node run-tests.js",
     "test:watch": "nodemon tests/euchre.test.js",
     "lint": "jshint public/js/euchre.js || true",
     "lint:fix": "jshint public/js/euchre.js --fix || true",
     "validate": "npm run lint && npm run test",
+    "build:web": "echo 'No web build needed - using public/ directory'",
+    "build:app": "npm run build:web && electron-builder -w",
     "build-win": "electron-builder --win --x64",
     "build-win32": "electron-builder --win --ia32",
     "build-mac": "electron-builder --mac",
@@ -35,11 +37,13 @@
     "@commitlint/cli": "^19.0.0",
     "@commitlint/config-conventional": "^19.0.0",
     "concurrently": "^9.2.1",
+    "cross-env": "^10.0.0",
     "electron": "^37.3.1",
     "electron-builder": "^26.0.12",
     "husky": "^9.0.0",
     "jshint": "^2.13.6",
-    "nodemon": "^3.0.2"
+    "nodemon": "^3.0.2",
+    "wait-on": "^8.0.4"
   },
   "dependencies": {
     "@vercel/analytics": "^1.5.0",
@@ -54,6 +58,13 @@
     "directories": {
       "output": "dist"
     },
+    "files": [
+      "electron/**/*",
+      "public/**/*",
+      "assets/**/*",
+      "server.js",
+      "node_modules/**/*"
+    ],
     "win": {
       "target": [
         {

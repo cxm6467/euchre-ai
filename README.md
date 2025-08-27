@@ -49,14 +49,14 @@ Download pre-built applications from the [GitHub Releases page](https://github.c
 - **macOS**: Download the `.dmg` file
 - **Linux**: Download the `.AppImage` file
 - **Android**: Download the `.apk` file
-- **iOS**: Download the `.ipa` file (requires iOS developer certificate or jailbreak)
+- **iOS**: Download the `.zip` file (iOS Simulator build for development/testing)
 
 ### Installation Instructions:
 - **Windows**: Run the installer and follow the setup wizard
 - **macOS**: Open the DMG and drag the app to Applications
 - **Linux**: Make the AppImage executable: `chmod +x *.AppImage && ./Euchre-*.AppImage`
 - **Android**: Enable "Install from unknown sources" in Settings → Security, then install the APK
-- **iOS**: Install via Xcode, TestFlight, or with developer certificate (enterprise/jailbreak only for unsigned IPAs)
+- **iOS**: Extract zip file and install in iOS Simulator via Xcode or drag to Simulator
 
 ## 🚀 Development Setup
 

@@ -93,14 +93,14 @@ jobs:
             - **macOS**: Download the `.dmg` file  
             - **Linux**: Download the `.AppImage` file
             - **Android**: Download the `.apk` file (may appear after other builds complete)
-            - **iOS**: Download the `.ipa` file (requires developer certificate)
+            - **iOS**: Download the `.zip` file (iOS Simulator build for development)
             
             ### Installation Instructions:
             - **Windows**: Run the installer and follow the setup wizard
             - **macOS**: Open the DMG and drag the app to Applications
             - **Linux**: Make the AppImage executable and run: `chmod +x *.AppImage && ./Euchre-*.AppImage`
             - **Android**: Enable "Install from unknown sources" and install the APK
-            - **iOS**: Install via Xcode, TestFlight, or with developer certificate
+            - **iOS**: Extract zip and drag to iOS Simulator or install via Xcode
             
             ### What's New:
             See the commit history for detailed changes in this release.
@@ -221,33 +221,34 @@ jobs:
           npm run cap:sync
           cd ios/App && pod install
 
-      - name: Build iOS App
+      - name: Build iOS App (Simulator)
         run: |
           cd ios/App
+          # Build for iOS Simulator (doesn't require code signing)
           xcodebuild -workspace App.xcworkspace \
                      -scheme App \
                      -configuration Release \
-                     -destination generic/platform=iOS \
-                     -archivePath ./build/App.xcarchive \
-                     archive
+                     -destination 'platform=iOS Simulator,name=iPhone 15' \
+                     -derivedDataPath ./build \
+                     build
           
-          # Export IPA
-          xcodebuild -exportArchive \
-                     -archivePath ./build/App.xcarchive \
-                     -exportPath ./build \
-                     -exportOptionsPlist ../../exportOptions.plist
+          # Create a simple zip package of the app bundle
+          mkdir -p ./build/Release-iphonesimulator
+          cd ./build/Build/Products/Release-iphonesimulator
+          zip -r ../../../../App-iOS-Simulator.zip App.app
+          cd ../../../../
 
-      - name: Upload iOS IPA
+      - name: Upload iOS App Bundle
         uses: actions/upload-artifact@v4
         with:
-          name: ios-ipa
-          path: ios/App/build/*.ipa
+          name: ios-app
+          path: ios/App/App-iOS-Simulator.zip
 
-      - name: Upload IPA to Release
+      - name: Upload iOS App to Release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: ios/App/build/*.ipa
+          files: ios/App/App-iOS-Simulator.zip
           append_body: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

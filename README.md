@@ -48,7 +48,7 @@ npm run server
 ```
 
 ### Deploy to Vercel
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/your-username/euchre-game)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/cxm6467/euchre-game)
 
 Or deploy manually:
 ```bash
@@ -100,7 +100,7 @@ The game is optimized for zero-config serverless deployment on Vercel:
 ## 📁 Project Structure
 
 ```
-euchre-ai/ (root)
+euchre-game/ (root)
 ├── public/                 # Web application files (auto-served by Vercel)
 │   ├── css/
 │   │   └── styles.css     # Responsive styling with intricate card patterns

@@ -84,7 +84,7 @@ Euchre AI is a sophisticated implementation of the classic Euchre card game feat
 
 ### File Structure
 ```
-euchre-ai/
+euchre-game/
 ├── public/
 │   ├── css/styles.css      # All styling and animations
 │   ├── js/euchre.js        # Main game logic (1600+ lines)

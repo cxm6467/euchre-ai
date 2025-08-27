@@ -495,8 +495,6 @@ class EuchreGame {
     selectTrump(suit) {
         this.trump = suit;
         
-        // Play trump selection sound
-        this.playSound('trumpSelect');
         
         // If it's the player's turn, show alone option
         if (this.trumpSelectionPlayer === 'south') {
@@ -553,8 +551,6 @@ class EuchreGame {
         // Set game phase to enable turn indicator
         this.gamePhase = 'play';
         
-        // Play start sound effect
-        this.playSound('gameStart');
         
         // Start play with player to left of dealer
         setTimeout(() => {
@@ -932,8 +928,6 @@ class EuchreGame {
                 const winnerName = this.playerSettings[winner.player]?.name || winner.player;
                 this.showMessage(`${winnerName} wins the trick!`);
                 
-                // Play trick won sound
-                this.playSound('trickWon');
                 
                 // Clear trick and handle next turn
                 setTimeout(() => this.processTrickCompletion(winner), 2000);
@@ -1736,30 +1730,6 @@ class EuchreGame {
                     oscillator.start();
                     oscillator.stop(this.audioContext.currentTime + 0.08);
                     break;
-                case 'trumpSelect':
-                    oscillator.frequency.setValueAtTime(523, this.audioContext.currentTime);
-                    oscillator.frequency.setValueAtTime(659, this.audioContext.currentTime + 0.1);
-                    oscillator.frequency.setValueAtTime(784, this.audioContext.currentTime + 0.2);
-                    gainNode.gain.setValueAtTime(0.1, this.audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.3);
-                    oscillator.start();
-                    oscillator.stop(this.audioContext.currentTime + 0.3);
-                    break;
-                case 'gameStart':
-                    oscillator.frequency.setValueAtTime(349, this.audioContext.currentTime);
-                    oscillator.frequency.setValueAtTime(440, this.audioContext.currentTime + 0.2);
-                    gainNode.gain.setValueAtTime(0.08, this.audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.4);
-                    oscillator.start();
-                    oscillator.stop(this.audioContext.currentTime + 0.4);
-                    break;
-                case 'trickWon':
-                    oscillator.frequency.setValueAtTime(523, this.audioContext.currentTime);
-                    gainNode.gain.setValueAtTime(0.1, this.audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.2);
-                    oscillator.start();
-                    oscillator.stop(this.audioContext.currentTime + 0.2);
-                    break;
                 default:
                     return;
             }
@@ -1933,30 +1903,27 @@ class EuchreGame {
     }
     
     /**
-     * Update turn indicator to show whose turn it is with dual arrows by avatars
+     * Update turn indicator to show whose turn it is with name glow effect
      * @method updateTurnIndicator
      */
     updateTurnIndicator() {
-        // Hide all turn arrows first
-        const allArrows = [
-            'north-turn-left', 'north-turn-right',
-            'east-turn-left', 'east-turn-right', 
-            'south-turn-left', 'south-turn-right',
-            'west-turn-left', 'west-turn-right'
-        ];
-        allArrows.forEach(arrowId => {
-            const arrow = document.getElementById(arrowId);
-            if (arrow) arrow.classList.remove('active');
+        // Remove glow from all player names first
+        const allPlayers = ['north', 'east', 'south', 'west'];
+        allPlayers.forEach(player => {
+            const nameElement = document.getElementById(`${player}-name`);
+            if (nameElement) {
+                nameElement.classList.remove('active-turn');
+                nameElement.setAttribute('aria-current', 'false');
+            }
         });
         
-        // Show arrows for current player during card play phase
+        // Add glow to current player's name during card play phase
         if (this.gamePhase === 'play' && this.currentPlayer) {
-            const leftArrow = document.getElementById(`${this.currentPlayer}-turn-left`);
-            const rightArrow = document.getElementById(`${this.currentPlayer}-turn-right`);
+            const currentNameElement = document.getElementById(`${this.currentPlayer}-name`);
             
-            if (leftArrow && rightArrow) {
-                leftArrow.classList.add('active');
-                rightArrow.classList.add('active');
+            if (currentNameElement) {
+                currentNameElement.classList.add('active-turn');
+                currentNameElement.setAttribute('aria-current', 'true');
                 
                 const playerName = this.playerSettings[this.currentPlayer]?.name || this.currentPlayer;
                 console.log(`🎯 Turn indicator: ${playerName} (${this.currentPlayer})`);

@@ -66,9 +66,7 @@
                 <div class="player-position top">
                     <div class="player-cards" id="north-cards"></div>
                     <div class="player-avatar-container">
-                        <div class="turn-arrow-small left-arrow" id="north-turn-left">▶</div>
                         <div class="player-avatar" id="north-avatar" onclick="game.showAvatarSelector('north')">🤖</div>
-                        <div class="turn-arrow-small right-arrow" id="north-turn-right">◀</div>
                         <div class="avatar-selector" id="north-avatar-selector">
                             <div class="avatar-option" data-avatar="🤖">🤖</div>
                             <div class="avatar-option" data-avatar="👨">👨</div>
@@ -80,15 +78,13 @@
                             <div class="avatar-option" data-avatar="🌟">🌟</div>
                         </div>
                     </div>
-                    <div class="player-name editable" onclick="game.editPlayerName('north')">North (Partner)</div>
+                    <div class="player-name editable" id="north-name" onclick="game.editPlayerName('north')" role="status" aria-live="polite" aria-current="false" aria-label="Current player indicator">North (Partner)</div>
                 </div>
                 
                 <div class="player-position left">
                     <div class="player-cards" id="west-cards"></div>
                     <div class="player-avatar-container">
-                        <div class="turn-arrow-small left-arrow" id="west-turn-left">▼</div>
                         <div class="player-avatar" id="west-avatar" onclick="game.showAvatarSelector('west')">🤖</div>
-                        <div class="turn-arrow-small right-arrow" id="west-turn-right">▲</div>
                         <div class="avatar-selector" id="west-avatar-selector">
                             <div class="avatar-option" data-avatar="🤖">🤖</div>
                             <div class="avatar-option" data-avatar="👨">👨</div>
@@ -100,15 +96,13 @@
                             <div class="avatar-option" data-avatar="🎲">🎲</div>
                         </div>
                     </div>
-                    <div class="player-name editable" onclick="game.editPlayerName('west')">West</div>
+                    <div class="player-name editable" id="west-name" onclick="game.editPlayerName('west')" role="status" aria-live="polite" aria-current="false" aria-label="Current player indicator">West</div>
                 </div>
                 
                 <div class="player-position right">
                     <div class="player-cards" id="east-cards"></div>
                     <div class="player-avatar-container">
-                        <div class="turn-arrow-small left-arrow" id="east-turn-left">▲</div>
                         <div class="player-avatar" id="east-avatar" onclick="game.showAvatarSelector('east')">🤖</div>
-                        <div class="turn-arrow-small right-arrow" id="east-turn-right">▼</div>
                         <div class="avatar-selector" id="east-avatar-selector">
                             <div class="avatar-option" data-avatar="🤖">🤖</div>
                             <div class="avatar-option" data-avatar="👨">👨</div>
@@ -120,7 +114,7 @@
                             <div class="avatar-option" data-avatar="💎">💎</div>
                         </div>
                     </div>
-                    <div class="player-name editable" onclick="game.editPlayerName('east')">East</div>
+                    <div class="player-name editable" id="east-name" onclick="game.editPlayerName('east')" role="status" aria-live="polite" aria-current="false" aria-label="Current player indicator">East</div>
                 </div>
                 
                 <div class="player-position bottom">
@@ -140,7 +134,7 @@
                             <div class="avatar-option" data-avatar="😏">😏</div>
                         </div>
                     </div>
-                    <div class="player-name editable" onclick="game.editPlayerName('south')">You</div>
+                    <div class="player-name editable" id="south-name" onclick="game.editPlayerName('south')" role="status" aria-live="polite" aria-current="false" aria-label="Current player indicator">You</div>
                 </div>
                 
                 <div class="center-area" id="center-area"></div>
@@ -363,11 +357,11 @@
                     <svg class="github-icon" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                     </svg>
-                    Developer
+                    Chris M
                 </a>
             </div>
             <div class="footer-text">
-                Built with ❤️ using Electron + Node.js
+                Built with ❤️ using Node.js
             </div>
         </div>
     </footer>

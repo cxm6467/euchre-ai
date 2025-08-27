@@ -84,28 +84,30 @@ npm run build-linux
 - **PWA Ready**: Can be installed as a Progressive Web App
 
 ### Vercel Deployment
-The game is optimized for serverless deployment on Vercel:
-- Static file serving from `/public` directory
+The game is optimized for zero-config serverless deployment on Vercel:
+- Static file serving from `/public` directory with automatic detection
+- Single-page application routing with fallback to index.html
 - No server-side dependencies required for gameplay
-- Fast global CDN delivery
+- Fast global CDN delivery with edge optimization
 - Automatic HTTPS and custom domains
+- One-click deployment from GitHub repository
 
 ## 📁 Project Structure
 
 ```
-euchre-game/
-├── public/                 # Web application files (served by Vercel)
+euchre-ai/ (root)
+├── public/                 # Web application files (auto-served by Vercel)
 │   ├── css/
-│   │   └── styles.css     # Responsive game styling with mobile support
+│   │   └── styles.css     # Responsive styling with intricate card patterns
 │   ├── js/
-│   │   └── euchre.js      # Complete game logic and AI engine
-│   └── index.html         # Main HTML file with mobile meta tags
+│   │   └── euchre.js      # Complete game logic with JSDoc documentation
+│   └── index.html         # Mobile-optimized HTML with PWA support
 ├── assets/                # Application icons and resources
 ├── main.js               # Electron main process
 ├── server.js             # Express server for local development
 ├── preload.js            # Electron preload script
 ├── package.json          # Dependencies and build scripts
-├── vercel.json           # Vercel deployment configuration
+├── vercel.json           # Simplified Vercel deployment configuration
 ├── commitlint.config.js  # Commit message linting
 └── .gitignore           # Git ignore rules
 ```

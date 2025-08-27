@@ -84,6 +84,12 @@ class EuchreGame {
         this.newGame();
     }
     
+    /**
+     * Load game statistics from either Electron API or server endpoint
+     * Supports both desktop and web deployment environments
+     * @async
+     * @returns {Promise<void>}
+     */
     async loadStats() {
         try {
             if (typeof electronAPI !== 'undefined') {
@@ -599,6 +605,14 @@ class EuchreGame {
         this.playCard(player, cardIndex);
     }
     
+    /**
+     * Calculate the value of a card in Euchre with proper bower hierarchy
+     * Right bower (Jack of trump) is highest, left bower (Jack of same color) is second
+     * @param {Object} card - Card object with rank and suit properties
+     * @param {string} trump - Current trump suit (♠, ♥, ♦, ♣)
+     * @param {string|null} leadSuit - The suit led in current trick (null for evaluation)
+     * @returns {number} Card value for comparison (higher = stronger)
+     */
     getCardValue(card, trump, leadSuit) {
         // Jacks in Euchre
         if (card.rank === 'J') {
@@ -988,6 +1002,11 @@ class EuchreGame {
         this.updateCardBacks();
     }
     
+    /**
+     * Apply selected card back pattern to all face-down cards
+     * Updates CSS classes for intricate pattern rendering
+     * @returns {void}
+     */
     updateCardBacks() {
         // Update all face-down cards with new back style
         document.querySelectorAll('.card.back').forEach(card => {

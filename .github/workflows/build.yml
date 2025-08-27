@@ -179,12 +179,8 @@ jobs:
           npx cap sync android
           cd android
           
-          # Build with the keystore in the android/app directory
-          ./gradlew assembleRelease \
-            -Pandroid.injected.signing.store.file=app/android-keystore.jks \
-            -Pandroid.injected.signing.store.password=android \
-            -Pandroid.injected.signing.key.alias=androiddebugkey \
-            -Pandroid.injected.signing.key.password=android
+          # Build release APK with signing configuration from build.gradle
+          ./gradlew assembleRelease
             
           # Verify the APK was built
           if [ -f "app/build/outputs/apk/release/app-release.apk" ]; then
@@ -192,6 +188,7 @@ jobs:
             ls -la app/build/outputs/apk/release/
           else
             echo "Error: APK was not generated"
+            find app/build/outputs -name "*.apk" || echo "No APK files found"
             exit 1
           fi
 

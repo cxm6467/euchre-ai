@@ -31,7 +31,10 @@
     "card game",
     "electron"
   ],
-  "author": "Euchre Game Developer",
+  "author": {
+    "name": "cxm6467",
+    "email": "cxm6467@gmail.com"
+  },
   "license": "MIT",
   "devDependencies": {
     "@commitlint/cli": "^19.0.0",
@@ -82,7 +85,10 @@
           ]
         }
       ],
-      "icon": "assets/icon.ico"
+      "icon": "assets/icon.ico",
+      "verifyUpdateCodeSignature": false,
+      "requestedExecutionLevel": "asInvoker",
+      "artifactName": "${productName}-${version}-Setup.${ext}"
     },
     "nsis": {
       "oneClick": false,
@@ -93,7 +99,11 @@
       "installerIcon": "assets/icon.ico",
       "uninstallerIcon": "assets/icon.ico",
       "installerHeaderIcon": "assets/icon.ico",
-      "deleteAppDataOnUninstall": false
+      "deleteAppDataOnUninstall": false,
+      "displayLanguageSelector": false,
+      "installerLanguages": ["en_US"],
+      "language": "1033",
+      "guid": "a4fc8c68-5456-4b8f-a9a3-2e8f9b7c1d6e"
     },
     "mac": {
       "target": [

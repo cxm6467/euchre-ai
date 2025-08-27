@@ -146,6 +146,7 @@ jobs:
 
       - name: Create Android keystore
         run: |
+          cd android
           if [ ! -z "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" ]; then
             echo "Using provided keystore from secrets"
             echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android-keystore.jks
@@ -154,19 +155,33 @@ jobs:
             keytool -genkey -v -keystore android-keystore.jks -alias euchre-key -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Euchre Game, OU=Game Dev, O=Euchre, L=City, S=State, C=US"
           fi
           
-          # Verify keystore was created
+          # Verify keystore was created in android directory
           if [ ! -f android-keystore.jks ]; then
             echo "Error: Keystore file was not created"
             exit 1
           fi
           
+          echo "Keystore created successfully:"
           ls -la android-keystore.jks
+          pwd
 
       - name: Build Android APK
         run: |
           npx cap sync android
           cd android
-          ./gradlew assembleRelease -Pandroid.injected.signing.store.file=../android-keystore.jks -Pandroid.injected.signing.store.password=android -Pandroid.injected.signing.key.alias=euchre-key -Pandroid.injected.signing.key.password=android
+          # Create or use the keystore in the android directory
+          if [ -f android-keystore.jks ]; then
+            echo "Using existing keystore"
+          else
+            echo "Generating debug keystore"
+            keytool -genkey -v -keystore android-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias androiddebugkey -storepass android -keypass android -dname "CN=Android Debug,O=Android,C=US"
+          fi
+          
+          # Build with the keystore in the android directory
+          ./gradlew assembleRelease -Pandroid.injected.signing.store.file=android-keystore.jks \
+                                   -Pandroid.injected.signing.store.password=android \
+                                   -Pandroid.injected.signing.key.alias=androiddebugkey \
+                                   -Pandroid.injected.signing.key.password=android
 
       - name: Upload Android APK
         uses: actions/upload-artifact@v4
